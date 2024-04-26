@@ -1,0 +1,38 @@
+<!-- resources/templates/admin.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Movie</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery for AJAX -->
+</head>
+<body>
+<h1>Admin - Add Movie</h1>
+<form id="add-movie-form">
+    <label for="movie-title">Movie Title:</label>
+    <input type="text" id="movie-title" name="title" required>
+    <button type="button" onclick="submitForm()">Add Movie</button>
+</form>
+
+<div id="message"></div> <!-- Display success or error messages -->
+
+<script>
+    function submitForm() {
+        const movieTitle = $("#movie-title").val();
+
+        // Make an AJAX request to add the movie
+        $.ajax({
+            url: "/user/admin/add-movie",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ title: movieTitle }),
+            success: function(response) {
+                $("#message").text("Movie added successfully!");
+            },
+            error: function(error) {
+                $("#message").text("Error adding movie: " + error.responseJSON.message);
+            }
+        });
+    }
+</script>
+</body>
+</html>

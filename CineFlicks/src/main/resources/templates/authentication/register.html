@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Registration</title>
+
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h2>User Registration</h2>
+
+    <!-- Display error messages -->
+    <div th:if="${error != null}" class="alert alert-danger" th:text="${error}"></div>
+
+    <!-- Registration form -->
+    <form th:action="@{/auth/register}" th:object="${userDTO}" method="post">
+        <div class="mb-3">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" th:field="*{firstName}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" th:field="*{lastName}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="username">Username:</label>
+            <input type="text" id="username" th:field="*{username}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+</div>
+
+<!-- Include Bootstrap Bundle with Popper -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

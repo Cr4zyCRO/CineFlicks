@@ -1,0 +1,23 @@
+<!-- resources/templates/movies/this_week.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Movies This Week</title>
+    <!-- Include CSS/JS as needed -->
+</head>
+<body>
+<h1>Movies Airing This Week</h1>
+
+<!-- Sorting Links -->
+<a th:href="@{/(sortBy='name')}">Sort by Name</a>
+<a th:href="@{/(sortBy='startTime')}">Sort by Start Time</a>
+
+<ul>
+    <li th:each="cinemaMovie : ${movies}">
+        Movie: <span th:text="${cinemaMovie.getMovie().getTitle()}"></span> -
+        Start Time: <span th:text="${cinemaMovie.getStartTime()}"></span> -
+        Cinema Room: <span th:text="${cinemaMovie.getCinema().getRoom()}"></span>
+    </li>
+</ul>
+</body>
+</html>
