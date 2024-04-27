@@ -8,6 +8,8 @@ import org.bg121788.cineflicks.service.movie_related.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -56,5 +58,9 @@ public class MovieService {
 
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
+    }
+
+    public Optional<Movie> getById(UUID movieId) {
+        return movieRepository.findById(movieId);
     }
 }

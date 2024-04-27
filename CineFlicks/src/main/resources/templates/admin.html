@@ -19,6 +19,7 @@
             <ul th:each="writer : ${movie.getWriter()}">
                 <li th:text="${writer.getWriter()}"></li>
             </ul>
+            <a th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}"> Assign Cinema</a>
         </div>
     </div>
 </div>

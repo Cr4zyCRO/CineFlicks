@@ -1,6 +1,8 @@
 package org.bg121788.cineflicks.service;
 
 import lombok.AllArgsConstructor;
+import org.bg121788.cineflicks.dto.CinemaMovieDTO;
+import org.bg121788.cineflicks.entity.Cinema;
 import org.bg121788.cineflicks.entity.CinemaMovie;
 import org.bg121788.cineflicks.repository.CinemaMovieRepository;
 import org.springframework.stereotype.Service;
@@ -34,5 +36,23 @@ public class CinemaMovieService {
 
         return movies;
 
+    }
+
+
+    public void saveCinemaMovie(CinemaMovieDTO cinemaMovieDTO) {
+        CinemaMovie cinemaMovie = new CinemaMovie();
+        cinemaMovie.setCinema(cinemaMovieDTO.getCinema());
+        cinemaMovie.setMovie(cinemaMovieDTO.getMovie());
+        cinemaMovie.setStartTime(cinemaMovieDTO.getStartTime());
+        cinemaMovie.setEndTime(cinemaMovieDTO.getEndTime());
+        cinemaMovieRepository.save(cinemaMovie);
+    }
+
+    public List<CinemaMovie> getCinemaMoviesByCinema(Cinema cinema) {
+        return cinemaMovieRepository.findByCinema(cinema);
+    }
+
+    public List<CinemaMovie> getAllCinemaMovies() {
+        return cinemaMovieRepository.findAll();
     }
 }

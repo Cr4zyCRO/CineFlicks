@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Assign Movie to Cinema</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"> <!-- For DatePicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.11.1/jquery.timepicker.min.css"> <!-- For TimePicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.11.1/jquery.timepicker.min.js"></script> <!-- For TimePicker -->
+</head>
+<body>
+
+<h1>Assign Movie to Cinema</h1>
+
+<form id="assign-movie-form" onsubmit="return false;">
+    <h2 th:text="${movie.title}">Movie Title</h2>
+
+    <label for="cinema">Select Cinema:</label>
+    <select id="cinema" name="cinemaId" required>
+        <option th:each="cinema : ${cinemas}" th:value="${cinema.id}" th:text="${cinema.room}"></option>
+    </select>
+
+    <label for="start-date">Start Date:</label>
+    <input type="date" id="start-date" name="start-date" required>
+
+    <label for="start-time">Start Time:</label>
+    <input type="time" id="start-time" name="start-time" required>
+
+    <input type="hidden" id="movieId" name="movieId" th:value="${movie.getId()}">
+
+    <button type="button" onclick="assignMovie()">Assign Movie</button>
+</form>
+
+<div id="message"></div> <!-- Placeholder for feedback messages -->
+
+
+<div id="cinemaMovies">
+    <div th:each="cinemaMovie : ${cinemaMovies}">
+        <p th:text="${cinemaMovie.getCinema().getRoom()}+', '+ ${cinemaMovie.getMovie().getTitle()}+': '+
+                     'TimeStart: ' + ${cinemaMovie.getStartTime()} + ', TimeEnd: ' + ${cinemaMovie.getEndTime()}"></p>
+    </div>
+</div>
+
+<script>
+    function assignMovie() {
+        const cinemaId = $("#cinema").val(); // Ensure this is set
+        const movieId = $("#movieId").val(); // Passed from the controller
+        const startDate = $("#start-date").val(); // Ensure valid date
+        const startTime = $("#start-time").val(); // Ensure valid time
+        const fullStartTime = `${startDate}T${startTime}`; // Combine date and time
+
+        if (!cinemaId || !startDate || !startTime) {
+            $("#message").text("Error: All fields are required."); // Basic error checking
+            return;
+        }
+
+        $.ajax({
+            url: "/cinema/assign-movie",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                cinemaId: cinemaId, // Make sure this matches backend
+                movieId: movieId,  // Make sure this matches backend
+                startTime: fullStartTime // Make sure this matches backend
+            }),
+            success: function(response) {
+                $("#message").text("Success: " + response);
+            },
+            error: function(error) {
+                $("#message").text("Error: " + (error.responseJSON?.message || error.responseText) + "\n" +
+                                    "movieId: " + (movieId) + " cinemaId: " + (cinemaId) + " fullStarttime: " + (fullStartTime)); // Better error message
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
