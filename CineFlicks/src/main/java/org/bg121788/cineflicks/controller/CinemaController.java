@@ -3,7 +3,6 @@ package org.bg121788.cineflicks.controller;
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.CinemaMovieDTO;
 import org.bg121788.cineflicks.entity.Cinema;
-import org.bg121788.cineflicks.entity.CinemaMovie;
 import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.service.CinemaMovieService;
 import org.bg121788.cineflicks.service.CinemaService;
@@ -49,6 +48,7 @@ public class CinemaController {
         UUID cinemaId = UUID.fromString((String) requestData.get("cinemaId"));
         UUID movieId = UUID.fromString((String) requestData.get("movieId"));
         String startTime = (String) requestData.get("startTime");
+        Double seatPrice = Double.valueOf(requestData.get("seatPrice").toString());
 
         Cinema cinema = null;
         Movie movie = null;
@@ -78,6 +78,7 @@ public class CinemaController {
         cinemaMovie.setMovie(movie);
         cinemaMovie.setStartTime(startDateTime);
         cinemaMovie.setEndTime(endDateTime);
+        cinemaMovie.setSeatPrice(seatPrice);
 
         cinemaMovieService.saveCinemaMovie(cinemaMovie);
 

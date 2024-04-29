@@ -17,12 +17,8 @@ public class Ticket {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "cinema_id")
-    private Cinema cinema;
-
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-    private Movie movie;
+    @JoinColumn(name = "cinema_movie_id")
+    private CinemaMovie cinemaMovie;
 
     @Column(name = "price")
     private Double price;

@@ -94,12 +94,14 @@ CREATE TABLE cinema (
 
 -- Create the cinema_movie table (many-to-many relationship between cinemas and movies)
 CREATE TABLE cinema_movie (
+                              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                               cinema_id UUID REFERENCES cinema(id),
                               movie_id UUID REFERENCES movie(id),
                               start_time TIMESTAMP,
                               end_time TIMESTAMP,
-                              PRIMARY KEY (cinema_id, movie_id)
+                              price_per_seat DOUBLE PRECISION
 );
+
 
 -- Create the users table
 CREATE TABLE "user" (
@@ -116,8 +118,7 @@ CREATE TABLE "user" (
 CREATE TABLE ticket (
                         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                         user_id UUID REFERENCES "user"(id),
-                        cinema_id UUID REFERENCES cinema(id),
-                        movie_id UUID REFERENCES movie(id),
+                        cinema_movie_id UUID REFERENCES cinema_movie(id),
                         price DOUBLE PRECISION,
                         selected_seats TEXT
 );
@@ -504,10 +505,10 @@ INSERT INTO director (director) VALUES
                                     ('Alejandro González Iñárritu');
 
 INSERT INTO cinema  (room,row,"column") VALUES
-                                            ('A001',20,15),
-                                            ('A002',20,15),
-                                            ('A003',20,15),
-                                            ('B001',30,15),
-                                            ('B002',30,15),
-                                            ('C001',35,15),
-                                            ('D001',40,15)
+                                            ('A001',10,15),
+                                            ('A002',10,15),
+                                            ('A003',12,15),
+                                            ('B001',12,15),
+                                            ('B002',10,15),
+                                            ('C001',15,15),
+                                            ('D001',12,15)

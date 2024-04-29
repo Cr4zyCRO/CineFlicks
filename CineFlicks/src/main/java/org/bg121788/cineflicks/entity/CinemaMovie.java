@@ -25,4 +25,6 @@ public class CinemaMovie {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
+    @Column(name = "price_per_seat")
+    private Double seatPrice;
 }

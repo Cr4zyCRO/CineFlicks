@@ -7,6 +7,9 @@ import org.bg121788.cineflicks.entity.enums.Role;
 import org.bg121788.cineflicks.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 @Data
 @Service
 public class UserService {
@@ -30,5 +33,9 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.getUserByEmail(email);
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 }

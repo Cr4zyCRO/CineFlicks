@@ -1,7 +1,6 @@
 package org.bg121788.cineflicks.service;
 
 import lombok.AllArgsConstructor;
-import org.bg121788.cineflicks.dto.CinemaMovieDTO;
 import org.bg121788.cineflicks.entity.Cinema;
 import org.bg121788.cineflicks.entity.CinemaMovie;
 import org.bg121788.cineflicks.repository.CinemaRepository;

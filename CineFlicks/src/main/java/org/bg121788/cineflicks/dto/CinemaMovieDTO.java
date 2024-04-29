@@ -12,5 +12,6 @@ public class CinemaMovieDTO {
     private Movie movie;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Double seatPrice;
 
 }

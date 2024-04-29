@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Service
@@ -45,6 +47,7 @@ public class CinemaMovieService {
         cinemaMovie.setMovie(cinemaMovieDTO.getMovie());
         cinemaMovie.setStartTime(cinemaMovieDTO.getStartTime());
         cinemaMovie.setEndTime(cinemaMovieDTO.getEndTime());
+        cinemaMovie.setSeatPrice(cinemaMovieDTO.getSeatPrice());
         cinemaMovieRepository.save(cinemaMovie);
     }
 
@@ -54,5 +57,9 @@ public class CinemaMovieService {
 
     public List<CinemaMovie> getAllCinemaMovies() {
         return cinemaMovieRepository.findAll();
+    }
+
+    public Optional<CinemaMovie> getById(UUID cinemaMovieId) {
+        return cinemaMovieRepository.findById(cinemaMovieId);
     }
 }

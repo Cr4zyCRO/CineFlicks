@@ -1,23 +1,45 @@
-<!-- resources/templates/movies/this_week.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Movies This Week</title>
-    <!-- Include CSS/JS as needed -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<h1>Movies Airing This Week</h1>
+<div class="container mt-4">
+    <a th:href="@{/user/admin}">Admin Page</a>
+    <h1>Movies Airing This Week</h1>
 
-<!-- Sorting Links -->
-<a th:href="@{/(sortBy='name')}">Sort by Name</a>
-<a th:href="@{/(sortBy='startTime')}">Sort by Start Time</a>
+    <div class="mb-3">
+        <a class="btn btn-outline-primary" th:href="@{/(sortBy='name')}">Sort by Name</a>
+        <a class="btn btn-outline-primary" th:href="@{/(sortBy='startTime')}">Sort by Start Time</a>
+    </div>
 
-<ul>
-    <li th:each="cinemaMovie : ${movies}">
-        Movie: <span th:text="${cinemaMovie.getMovie().getTitle()}"></span> -
-        Start Time: <span th:text="${cinemaMovie.getStartTime()}"></span> -
-        Cinema Room: <span th:text="${cinemaMovie.getCinema().getRoom()}"></span>
-    </li>
-</ul>
+    <div class="row" th:each="movieGroup : ${groupedMovies}">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 th:text="${movieGroup.key}">Movie Title</h4>
+                </div>
+                <div class="card-body">
+                    <p>Showtimes:</p>
+
+                    <div th:each="dateGroup : ${movieGroup.value}">
+                        <h5 th:text="${#temporals.format(dateGroup.key, 'yyyy-MM-dd')}">Date</h5>
+
+                        <div th:each="cinemaMovie : ${dateGroup.value}">
+                            <a class="btn btn-secondary"
+                               th:href="@{/ticket/{cinemaMovieId}(cinemaMovieId=${cinemaMovie.getId()})}"
+                               th:text="'Room ' + ${cinemaMovie.getCinema().getRoom()} + ' - ' + ${#temporals.format(cinemaMovie.getStartTime(), 'HH:mm')}">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
