@@ -59,7 +59,8 @@ public class SecurityConfiguration{
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/auth/register"),
-                                AntPathRequestMatcher.antMatcher("/auth/login")
+                                AntPathRequestMatcher.antMatcher("/auth/login"),
+                                AntPathRequestMatcher.antMatcher("/")
 
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -69,12 +70,12 @@ public class SecurityConfiguration{
                         .defaultSuccessUrl("/")
 
 
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
+                        .logoutSuccessUrl("/auth/login?logout=true")
+                        .permitAll()
                 );
-//                .logout(logout -> logout
-//                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//                        .logoutSuccessUrl("/login?logout=true")
-//                        .permitAll()
-//                );
 
         return http.build();
     }

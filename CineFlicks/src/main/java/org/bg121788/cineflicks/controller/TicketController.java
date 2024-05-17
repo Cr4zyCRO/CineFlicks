@@ -2,6 +2,7 @@ package org.bg121788.cineflicks.controller;
 
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.TicketDTO;
+import org.bg121788.cineflicks.dto.UserDTO;
 import org.bg121788.cineflicks.entity.CinemaMovie;
 import org.bg121788.cineflicks.entity.User;
 import org.bg121788.cineflicks.service.*;
@@ -76,14 +77,7 @@ public class TicketController {
 
         // Get the current authenticated user's details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = null;
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            String username = ((UserDetails) authentication.getPrincipal()).getUsername();
-            Optional<User> userOptional = userService.findByUsername(username);
-            if (userOptional.isPresent()) {
-                user = userOptional.get();
-            }
-        }
+        UserDTO user = userService.findByUsername(((UserDetails) authentication.getPrincipal()).getUsername());
 
 
         // Calculate the ticket price based on the number of selected seats
@@ -94,8 +88,8 @@ public class TicketController {
 
         // Create and populate the TicketDTO
         TicketDTO ticketDTO = new TicketDTO();
-        ticketDTO.setUser(user);  // Store the user object
-        ticketDTO.setCinemaMovie(cinemaMovie);  // Store the CinemaMovie object
+        ticketDTO.setUser(user);
+        ticketDTO.setCinemaMovie(cinemaMovie);
         ticketDTO.setSelectedSeats(selectedSeats);
         ticketDTO.setPrice(totalPrice);
 

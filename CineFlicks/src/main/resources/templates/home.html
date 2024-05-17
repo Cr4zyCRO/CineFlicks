@@ -6,20 +6,33 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
 <!-- Navbar -->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="#">Movies This Week</a>
+    <a class="navbar-brand" th:href="@{/}">Movies This Week</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/user/admin}">Admin Page</a>
+                <!-- Conditionally render Sign In button or Profile and Sign Out buttons -->
+                <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" href="/profile">Profile</a>
+                    <a class="nav-link" href="/auth/logout">Sign Out</a>
+                </th:block>
+                <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                    <a class="nav-link" href="/auth/login">Sign In</a>
+                </th:block>
+            </li>
+            <!-- Conditionally render Admin Page link based on user's role -->
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" href="/user/admin">Admin Page</a>
             </li>
         </ul>
     </div>
 </nav>
+
 
 <div class="container-fluid">
     <div class="row">

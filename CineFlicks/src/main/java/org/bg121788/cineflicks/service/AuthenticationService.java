@@ -1,8 +1,12 @@
 package org.bg121788.cineflicks.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import org.bg121788.cineflicks.dto.UserDTO;
 import org.bg121788.cineflicks.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -32,5 +36,11 @@ public class AuthenticationService {
             process.replace("error", process.get("error"),  "Provided email is already taken.");
         }
         return process;
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
     }
 }

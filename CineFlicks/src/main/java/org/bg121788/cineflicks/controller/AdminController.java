@@ -16,7 +16,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/user/admin")
+@RequestMapping("/profile/admin")
 @PreAuthorize("hasAuthority('ROLE_ADMIN')")
 public class AdminController {
     private final UserService userService;
@@ -76,7 +76,6 @@ public class AdminController {
         movieDTO.setLanguage(Arrays.asList(((String) omdbResponse.get("Language")).split(",\\s*")));
 
 
-        System.err.println(movieDTO + "\n");
         boolean movieAdded = movieService.addNewMovie(movieDTO);
 
         if (movieAdded) {

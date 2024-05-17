@@ -1,0 +1,160 @@
+<!-- resources/templates/admin.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profile Page</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/profile.css">
+    <!-- Include Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+</head>
+<body>
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">
+            <span th:text="${user.getFirstName() + ' ' + user.getLastName()}">Full Name</span>
+            <small class="text-muted" th:text="${'(' + user.getRole() + ')'}">(Role)</small>
+        </h2>
+
+        <p class="mb-2">
+            <strong>Username:</strong> <span th:text="${user.getUsername()}">Username</span>
+        </p>
+
+        <p class="mb-2">
+            <strong>Email:</strong> <span th:text="${user.getEmail()}">Email</span>
+        </p>
+    </div>
+</div>
+
+<!-- Watched Tickets -->
+<div class="container mt-4">
+    <h2>Watched Tickets</h2>
+    <div class="mb-4">
+        <input type="text" id="watched-search-bar" class="form-control" placeholder="Search watched tickets..." onkeyup="filterWatchedTickets()">
+    </div>
+    <div class="row" id="watched-tickets">
+        <div class="col-lg-6 col-md-12 col-sm-12 watched-tickets-container " th:each="ticket: ${watchedTickets}" th:id="'movie-' + ${ticket.getId()}">
+            <div class="card ticket-card">
+                <div class="row no-gutters">
+                    <!-- Left side for information -->
+                    <div class="col-md-8 d-flex flex-column">
+                        <div class="card-body">
+                            <div class="card-title">
+                                <h4 class="font-weight-bold" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h4>
+                                <span class="disabled">movie</span>
+                            </div>
+
+                            <div class="card-text">
+                                <h6 th:text="${ticket.getUser().getFirstName() + ' ' + ticket.getUser().getLastName()}"></h6>
+                                <span class="disabled">owner</span>
+                            </div>
+
+                            <div class="card-text date">
+                                <h6 th:text="${#temporals.format(ticket.getCinemaMovie().getStartTime(), 'MMMM dd, yyyy')}"></h6>
+                                <span class="disabled">date</span>
+                            </div>
+
+                            <div class="card-text runtime">
+                                <h6 th:text="${ticket.getCinemaMovie().getMovie().getRuntime()}"></h6>
+                                <span class="disabled">duration</span>
+                            </div>
+
+                            <div class="card-text seats">
+                                <h6 th:text="${ticket.getSelectedSeats()}"></h6>
+                                <span class="disabled">seats</span>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1"></div> <!-- Flex grow to fill remaining space -->
+                    </div>
+                    <!-- Right side for price and barcode -->
+                    <div class="col-md-4 d-flex flex-column card-footer">
+                        <div class="d-flex flex-column  flex-md-column flex-sm-row w-100">
+                            <!-- Price Display -->
+                            <div class="d-flex justify-content-center align-items-center flex-grow-2 w-100 p-2">
+                                <div class="text-center">
+                                    <h6 class="price font-weight-bold text-white" th:text="${ticket.getPrice()}"> </h6>
+                                    <span class="disabled text-white">euro</span>
+                                </div>
+                            </div>
+
+                            <!-- Rating Display -->
+                            <div class="d-flex justify-content-center align-items-center flex-grow-1 w-100 p-2">
+                                <div class="rating">
+                                    <!-- Your rating component here -->
+                                </div>
+                            </div>
+
+                            <!-- Barcode Display -->
+                            <div class="d-flex justify-content-center align-items-start flex-grow-1 w-100 p-2">
+                                <div class="barcode"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Tickets -->
+<div class="container mt-4">
+    <h2>Upcoming Tickets</h2>
+    <div class="mb-4">
+        <input type="text" id="upcoming-search-bar" class="form-control" placeholder="Search upcoming tickets..." onkeyup="filterUpcomingTickets()">
+    </div>
+    <div class="row" id="upcoming-tickets">
+        <div class="col-lg-4 col-md-6 mb-4 upcoming-tickets-container" th:each="ticket: ${upcomingTickets}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h5>
+                    <p class="card-text" th:text="'Date: ' + ${ticket.getCinemaMovie().getStartTime()}"></p>
+                    <p class="card-text" th:text="'Time: ' + ${ticket.getCinemaMovie().getMovie().getRuntime()}"></p>
+                    <p class="card-text" th:text="'Cinema: ' + ${ticket.getCinemaMovie().getCinema().getRoom()}"></p>
+                    <p class="card-text" th:text="'Price: ' + ${ticket.getPrice()}"></p>
+                    <p class="card-text" th:text="'Seats: ' + ${ticket.getSelectedSeats()}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function filterWatchedTickets() {
+        var query = document.getElementById("watched-search-bar").value.toLowerCase();
+        var watchedTickets = document.getElementById("watched-tickets").getElementsByClassName("watched-tickets-container"); // Get all watched ticket cards
+
+        Array.from(watchedTickets).forEach(function(ticket){
+            var title = ticket.getElementsByClassName("card-title")[0].innerHTML.toLowerCase();
+            if (title.includes(query)) {
+                ticket.style.display = "block"; // Show matching movies
+            } else {
+                ticket.style.display = "none"; // Hide non-matching movies
+            }
+            });
+    }
+
+    function filterUpcomingTickets() {
+        var query = document.getElementById("upcoming-search-bar").value.toLowerCase();
+        var upcomingTickets = document.getElementById("upcoming-tickets").getElementsByClassName("upcoming-tickets-container");  // Get all upcoming ticket cards
+
+        Array.from(upcomingTickets).forEach(function(ticket){
+            var title = ticket.getElementsByClassName("card-title")[0].innerHTML.toLowerCase();
+            if (title.includes(query)) {
+                ticket.style.display = "block"; // Show matching movies
+            } else {
+                ticket.style.display = "none"; // Hide non-matching movies
+            }
+        });
+    }
+
+</script>
+
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

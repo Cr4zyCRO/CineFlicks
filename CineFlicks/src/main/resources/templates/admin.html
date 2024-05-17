@@ -31,7 +31,7 @@
                     <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
                     <p class="card-text">Rated: <span th:text="${movie.getRated()}"></span></p> <!-- Rated -->
                     <p class="card-text">Runtime: <span th:text="${movie.getRuntime()}"></span></p> <!-- Runtime -->
-                    <p class="card-text">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()}"></span></p> <!-- Genres -->
+                    <p class="card-text">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()} + ' '"></span></p> <!-- Genres -->
                     <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
 
 

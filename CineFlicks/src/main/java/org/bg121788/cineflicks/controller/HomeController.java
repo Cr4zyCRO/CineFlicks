@@ -118,7 +118,7 @@ public class HomeController {
         return movies.stream()
                 .collect(Collectors.groupingBy(
                         cm -> cm.getMovie().getTitle(),
-                        LinkedHashMap::new, // LinkedHashMap to maintain insertion order based on movie title
+                        TreeMap::new,
                         Collectors.groupingBy(cm -> cm.getStartTime().toLocalDate())
                 ));
     }

@@ -28,16 +28,28 @@ public class UserService {
         userRepository.save(newUser);
     }
 
-    public User getUserByUsername(String username) {
-        return userRepository.getUserByUsername(username);
+
+    public UserDTO findByUsername(String username) {
+        User user = userRepository.getUserByUsername(username);
+        if (user == null) {
+            return null;
+        }
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setRole(user.getRole().toString());
+        return userDTO;
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email);
-    }
-
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User convertToEntity(UserDTO userDTO) {
+        Optional<User> optionalUser = userRepository.findByUsername(userDTO.getUsername());
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new IllegalArgumentException("User not found: " + userDTO.getUsername());
+        }
     }
 
     public List<User> getAllUsers() {
