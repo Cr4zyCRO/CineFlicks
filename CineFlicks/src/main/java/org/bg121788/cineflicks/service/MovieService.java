@@ -63,4 +63,13 @@ public class MovieService {
     public Optional<Movie> getById(UUID movieId) {
         return movieRepository.findById(movieId);
     }
+
+    public List<Movie> getTop10MostRated(){
+        return movieRepository.findTop10ByOrderByImdb_ratingDesc();
+    }
+
+
+    public void deleteMovie(UUID movieId) {
+        movieRepository.deleteById(movieId);
+    }
 }

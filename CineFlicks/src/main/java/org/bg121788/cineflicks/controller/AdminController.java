@@ -24,8 +24,13 @@ public class AdminController {
 
     @GetMapping
     public ModelAndView adminWebsite(){
-        ModelAndView modelAndView = new ModelAndView("/admin");
+        ModelAndView modelAndView = new ModelAndView("admin");
         modelAndView.addObject("movies", movieService.getAllMovies());
+        modelAndView.addObject("users", userService.getAllUsers());
+        modelAndView.addObject("topRated", movieService.getTop10MostRated());
+
+
+
         return modelAndView;
     }
 

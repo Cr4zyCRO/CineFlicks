@@ -3,26 +3,124 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Admin Page</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> <!-- Include jQuery for AJAX -->
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
 </head>
 <body>
 
 <a th:href="@{/user/admin/add-movie}"> Add a new movie</a>
 
-<div id="movie-list">
+<div class="container mt-4">
     <h1>Movies</h1>
-    <div th:each="movie : ${movies}">
-        <div>
-            <h2 th:text="${movie.getTitle()}"></h2>
-            <img th:src="${movie.getPoster()}" alt="imagePoster">
-            <p th:text="${movie.getPlot()}"></p>
-            <ul th:each="writer : ${movie.getWriter()}">
-                <li th:text="${writer.getWriter()}"></li>
-            </ul>
-            <a th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}"> Assign Cinema</a>
+
+    <!-- Search bar to filter movies -->
+    <div class="mb-4">
+        <input type="text" id="search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterMovies()">
+    </div>
+
+    <div class="row" id="movie-list"> <!-- Bootstrap grid structure -->
+        <!-- Loop through movies and display as cards -->
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${movies}" th:id="'movie-' + ${movie.getId()}"> <!-- Responsive columns -->
+            <div class="card mb-4"> <!-- Bootstrap card component -->
+                <div class="card-body"> <!-- Card content -->
+                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
+                    <p class="card-text">Rated: <span th:text="${movie.getRated()}"></span></p> <!-- Rated -->
+                    <p class="card-text">Runtime: <span th:text="${movie.getRuntime()}"></span></p> <!-- Runtime -->
+                    <p class="card-text">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()}"></span></p> <!-- Genres -->
+                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
+
+
+                    <form th:action="@{/movie/{id}(id=${movie.getId()})}" method="post"  class="ml-auto">
+                        <input type="hidden" name="_method" value="post"/>
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Section to display top-rated movies -->
+<div class="container mt-4">
+    <h2>Top-Rated Movies</h2>
+    <div class="row"> <!-- Bootstrap grid for responsive layout -->
+        <!-- Display top-rated movies as Bootstrap cards -->
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${topRated}"> <!-- Responsive column sizes -->
+            <div class="card mb-4"> <!-- Bootstrap card component -->
+                <img th:src="${movie.getPoster()}" class="card-img-top" th:alt="${'Poster for ' + movie.getTitle()}"> <!-- Card image -->
+                <div class="card-body"> <!-- Card body -->
+                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
+
+                    <!-- Card content with number of votes, score, and awards -->
+                    <p class="card-text">
+                        <!-- Display IMDb rating -->
+                        <strong>IMDb Rating:</strong> <span th:text="${movie.getImdb_rating()}"></span><br>
+
+                        <!-- Display number of IMDb votes -->
+                        <strong>Votes:</strong> <span th:text="${movie.getImdb_votes()}"></span><br>
+
+                        <!-- Display awards, if available -->
+                        <strong>Awards:</strong> <span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span>
+                    </p>
+
+                    <!-- Action button to assign the movie to a cinema -->
+                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section to display users -->
+<div class="container mt-4">
+    <h2>Users</h2>
+    <div class="table-responsive"> <!-- Make the table responsive -->
+        <table class="table table-bordered table-striped"> <!-- Bootstrap table -->
+            <thead>
+            <tr>
+                <th>User ID</th>
+                <th>User Name</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}"> <!-- Loop through the list of users -->
+                <td th:text="${user.getId()}"></td> <!-- User ID -->
+                <td th:text="${user.getUsername()}"></td> <!-- User name -->
+                <td th:text="${user.getEmail()}"></td> <!-- Email -->
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Script to implement the filter and AJAX deletion -->
+<script>
+    // Function to filter movies based on search input
+    function filterMovies() {
+        var query = document.getElementById("search-bar").value.toLowerCase();
+        var movies = document.getElementById("movie-list").getElementsByClassName("col-lg-4");
+
+        Array.from(movies).forEach(function(movie) {
+            var title = movie.getElementsByClassName("card-title")[0].innerText.toLowerCase();
+            if (title.includes(query)) {
+                movie.style.display = "block"; // Show matching movies
+            } else {
+                movie.style.display = "none"; // Hide non-matching movies
+            }
+        });
+    }
+
+</script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
 </body>
 </html>

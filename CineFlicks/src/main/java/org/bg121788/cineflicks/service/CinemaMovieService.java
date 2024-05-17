@@ -19,23 +19,22 @@ import java.util.UUID;
 public class CinemaMovieService {
     private final CinemaMovieRepository cinemaMovieRepository;
 
-    public List<CinemaMovie> getMoviesForThisWeek(String sortBy){
+    public List<CinemaMovie> getMoviesForThisWeek(String sortDir){
         LocalDateTime start = LocalDateTime.now().with(ChronoField.DAY_OF_WEEK, 1);
         LocalDateTime end = start.plusDays(7);
 
-        List<CinemaMovie> movies = cinemaMovieRepository.findAllByStartTimeBetween(start,end);
+        List<CinemaMovie> movies = cinemaMovieRepository.findAllByStartTimeBetween(start, end);
 
-        if (sortBy!=null){
-            switch (sortBy){
-                case "name":
-                    movies.sort(Comparator.comparing(cm -> cm.getMovie().getTitle()));
-                    break;
-                case "startTime":
-                    movies.sort(Comparator.comparing(CinemaMovie::getStartTime));
-                    break;
-            }
+        // Sort movies by name in the specified direction
+        if ("ASC".equals(sortDir)) {
+            movies.sort(Comparator.comparing(cm -> cm.getMovie().getTitle()));
+        } else {
+            movies.sort(Comparator.comparing(cm -> cm.getMovie().getTitle(), Comparator.reverseOrder()));
         }
 
+//        for (CinemaMovie movie : movies) {
+//            System.err.println("Movie: " + movie.getMovie().getTitle());
+//        }
         return movies;
 
     }

@@ -3,34 +3,112 @@
 <head>
     <title>Movies This Week</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<div class="container mt-4">
-    <a th:href="@{/user/admin}">Admin Page</a>
-    <h1>Movies Airing This Week</h1>
-
-    <div class="mb-3">
-        <a class="btn btn-outline-primary" th:href="@{/(sortBy='name')}">Sort by Name</a>
-        <a class="btn btn-outline-primary" th:href="@{/(sortBy='startTime')}">Sort by Start Time</a>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" href="#">Movies This Week</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/user/admin}">Admin Page</a>
+            </li>
+        </ul>
     </div>
+</nav>
 
-    <div class="row" th:each="movieGroup : ${groupedMovies}">
-        <div class="col-md-6">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h4 th:text="${movieGroup.key}">Movie Title</h4>
-                </div>
-                <div class="card-body">
-                    <p>Showtimes:</p>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Aside Container -->
+        <div class="col-md-3 bg-light aside-container">
+            <!-- Filter options -->
+            <div class="mb-3">
+                <h4>Filters:</h4>
+                <form id="filterForm">
+                    <!-- Language filter -->
+                    <div>
+                        <h5>Languages:</h5>
+                        <div th:each="language : ${languages}">
+                            <label>
+                                <input type="checkbox" name="languages" th:value="${language}"> [[${language}]]
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Rating filter -->
+                    <div>
+                        <h5>Ratings:</h5>
+                        <div th:each="rating : ${ratings}">
+                            <label>
+                                <input type="radio" name="ratings" th:value="${rating}"> [[${rating}]]
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Genre filter -->
+                    <div>
+                        <h5>Genres:</h5>
+                        <div th:each="genre : ${genres}">
+                            <label>
+                                <input type="checkbox" name="genres" th:value="${genre}"> [[${genre}]]
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Apply button -->
+                    <button type="submit" id="applyButton" class="btn btn-primary">Apply</button>
+                </form>
+            </div>
+        </div>
 
-                    <div th:each="dateGroup : ${movieGroup.value}">
-                        <h5 th:text="${#temporals.format(dateGroup.key, 'yyyy-MM-dd')}">Date</h5>
+        <!-- Main Container -->
+        <div class="col-md-9 main-container">
+            <h1 class="mt-4">Movies Airing This Week</h1>
 
-                        <div th:each="cinemaMovie : ${dateGroup.value}">
-                            <a class="btn btn-secondary"
-                               th:href="@{/ticket/{cinemaMovieId}(cinemaMovieId=${cinemaMovie.getId()})}"
-                               th:text="'Room ' + ${cinemaMovie.getCinema().getRoom()} + ' - ' + ${#temporals.format(cinemaMovie.getStartTime(), 'HH:mm')}">
-                            </a>
+            <div class="mb-3">
+                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='title')}">
+                    Sort by Title
+                </a>
+                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbRating')}">
+                    Sort by IMDb Rating
+                </a>
+                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbVotes')}">
+                    Sort by IMDb Votes
+                </a>
+                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='runtime')}">
+                    Sort by Runtime
+                </a>
+                <span th:text="${sortDir == 'ASC' ? 'Ascending' : 'Descending'}"></span>
+            </div>
+
+            <!-- Movie Cards -->
+            <div class="row" th:each="movieGroup : ${groupedMovies}">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h4 th:text="${movieGroup.key}" class="mb-0">Movie Title</h4>
+                        </div>
+                        <div class="card-body">
+                            <div th:with="movie=${movieGroup.value.get(movieGroup.value.keySet().iterator().next()).get(0).getMovie()}"
+                                 class="movie-info">
+                                <span class="d-block">IMDb Rating: <span th:text="${movie.getImdb_rating()}"></span></span>
+                                <span class="d-block">IMDb Votes: <span th:text="${movie.getImdb_votes()}"></span></span>
+                                <span class="d-block">Runtime: <span th:text="${movie.getRuntime()}"></span></span>
+                                <span class="d-block">Rated: <span th:text="${movie.getRated()}"></span></span>
+                                <span class="d-block" th:each="genre : ${movie.getGenre()}">Genre: <span th:text="${genre.getGenre()} + ' '"></span></span>
+                                <span class="d-block" th:each="language : ${movie.getLanguage()}">Language: <span th:text="${language.getLanguage()} + ' '"></span></span>
+                            </div>
+                            <h4 class="mt-4">Showtimes:</h4>
+                            <div th:each="dateGroup : ${movieGroup.value}">
+                                <h5 th:text="${#temporals.format(dateGroup.key, 'yyyy-MM-dd')}" class="mt-3">Date</h5>
+                                <div th:each="cinemaMovie : ${dateGroup.value}">
+                                    <a class="btn btn-secondary mt-2"
+                                       th:href="@{/ticket/{cinemaMovieId}(cinemaMovieId=${cinemaMovie.getId()})}"
+                                       th:text="'Room ' + ${cinemaMovie.getCinema().getRoom()} + ' - ' + ${#temporals.format(cinemaMovie.getStartTime(), 'HH:mm')}">
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -39,7 +117,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
