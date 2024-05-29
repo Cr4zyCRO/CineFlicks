@@ -15,4 +15,6 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
     @Query("SELECT m FROM Movie m WHERE m.imdb_votes > 500 ORDER BY m.imdb_rating DESC LIMIT 10")
     List<Movie> findTop10ByOrderByImdb_ratingDesc();
 
+    @Query("SELECT m FROM Movie m ORDER BY m.movie_views DESC LIMIT 10")
+    List<Movie> findTop10ByOrderByImdb_votesDesc();
 }

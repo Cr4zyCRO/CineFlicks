@@ -1,6 +1,7 @@
 package org.bg121788.cineflicks.entity;
 
 import jakarta.persistence.*;
+import jdk.jfr.Unsigned;
 import lombok.Data;
 
 import java.util.List;
@@ -49,6 +50,9 @@ public class Movie {
 
     @Column(name = "imdb_id")
     private String imdb_id;
+
+    @Column(name = "movie_views")
+    private Integer movie_views;
 
 
     @Column(name = "language")

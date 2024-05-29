@@ -22,4 +22,5 @@ public class MovieDTO {
     private List<String> writer;
     private List<String> actor;
     private List<String> language;
+    private Integer movie_views;
 }

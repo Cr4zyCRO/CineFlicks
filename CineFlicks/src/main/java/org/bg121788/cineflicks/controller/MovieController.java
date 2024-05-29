@@ -25,7 +25,18 @@ public class MovieController {
             movieService.deleteMovie(id); // Delete the movie
         }
 
-        return new ModelAndView("redirect:/user/admin");
+        return new ModelAndView("redirect:/profile/admin");
+    }
+
+    @PostMapping("/{id}/rating")
+    public ModelAndView updateRating(@PathVariable UUID id, @RequestParam Integer rating) {
+        // Check if the movie exists
+        Optional<Movie> movieOptional = movieService.getById(id);
+
+        // Delete the movie
+        movieOptional.ifPresent(movie -> movieService.updateRating(movie, rating));
+
+        return new ModelAndView("redirect:/profile/admin");
     }
 
 

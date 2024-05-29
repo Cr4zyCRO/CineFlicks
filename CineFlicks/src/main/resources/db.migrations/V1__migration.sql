@@ -46,7 +46,8 @@ CREATE TABLE movie (
                        metascore INTEGER,
                        imdb_rating DOUBLE PRECISION,
                        imdb_votes INTEGER,
-                       imdb_id VARCHAR(20) UNIQUE
+                       imdb_id VARCHAR(20) UNIQUE,
+                       movie_views INTEGER
 );
 
 -- Create the movie_genre table (many-to-many relationship between movies and genres)
@@ -121,6 +122,13 @@ CREATE TABLE ticket (
                         cinema_movie_id UUID REFERENCES cinema_movie(id),
                         price DOUBLE PRECISION,
                         selected_seats TEXT
+);
+
+
+CREATE TABLE Announcement(
+                        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                        movie_id UUID REFERENCES movie(id),
+                        expiration_date TIMESTAMP
 );
 
 INSERT INTO "user" (first_name, last_name, username, email, password, role) VALUES

@@ -28,6 +28,7 @@ public class AdminController {
         modelAndView.addObject("movies", movieService.getAllMovies());
         modelAndView.addObject("users", userService.getAllUsers());
         modelAndView.addObject("topRated", movieService.getTop10MostRated());
+        modelAndView.addObject("topViewed", movieService.getTop10MostViewed());
 
 
 

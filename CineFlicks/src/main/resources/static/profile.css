@@ -1,15 +1,12 @@
-
 :root {
     --red: #e84c3d;
     --grey: #ecedef;
     --black: #343434;
 }
 
-
 .card {
     border: none;
-    height: 300px;
-    margin-bottom: 20px; /* Add space between cards */
+    margin-bottom: 20px;
 }
 
 .card > * {
@@ -24,9 +21,7 @@
 }
 
 .ticket-card {
-    width: calc(100% - 20px); /* Make the cards wider */
-    margin-left: 10px;
-    margin-right: 10px;
+    width: calc(100% - 20px);
 }
 
 .ticket-card .card-footer {
@@ -39,8 +34,16 @@
     justify-content: space-between;
 }
 
-.card-title h4 {
-    font-size: 1.2rem; /* Smaller font size */
+.card-title h4, .card-text h6 {
+    font-size: 1rem; /* Adjusted to a uniform size */
+    margin: 0;
+}
+
+.card-title span, .card-text span {
+    font-weight: bold;
+    color: gray;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
 .card-text {
@@ -55,25 +58,6 @@
     margin-bottom: 10px;
 }
 
-.card-text h6 {
-    font-size: 1rem; /* Smaller font size */
-    margin: 0;
-}
-
-.card-text span {
-    font-weight: bold;
-    color: gray;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-}
-
-.card-title span {
-    font-weight: bold;
-    color: gray;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-}
-
 .price {
     font-size: 3rem;
     margin-bottom: 10px;
@@ -84,6 +68,10 @@
     color: white;
     text-transform: uppercase;
     font-size: 1rem;
+}
+
+.watched-tickets-container, .upcoming-tickets-container {
+    margin-bottom: 10px;
 }
 
 .barcode {
@@ -127,6 +115,3 @@
     117px 0 0 1px var(--black),
     121px 0 0 1px var(--black);
 }
-
-
-

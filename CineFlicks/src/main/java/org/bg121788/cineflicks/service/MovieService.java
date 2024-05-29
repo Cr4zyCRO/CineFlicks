@@ -43,6 +43,7 @@ public class MovieService {
         movie.setImdb_rating(movieDTO.getImdb_rating());
         movie.setImdb_votes(movieDTO.getImdb_votes());
         movie.setImdb_id(movieDTO.getImdb_id());
+        movie.setMovie_views(0);
 
         movie.setGenre(genreService.getFromDTO(movieDTO.getGenre()));
         movie.setDirector(directorService.getFromDTO(movieDTO.getDirector()));
@@ -67,9 +68,23 @@ public class MovieService {
     public List<Movie> getTop10MostRated(){
         return movieRepository.findTop10ByOrderByImdb_ratingDesc();
     }
+    public List<Movie> getTop10MostViewed(){
+        return movieRepository.findTop10ByOrderByImdb_votesDesc();
+    }
 
 
     public void deleteMovie(UUID movieId) {
         movieRepository.deleteById(movieId);
+    }
+
+    public void updateViews(Movie movie, int size) {
+        movie.setMovie_views(movie.getMovie_views() + size);
+        movieRepository.save(movie);
+    }
+
+    public void updateRating(Movie movie, Integer rating) {
+        movie.setImdb_rating(movie.getImdb_rating()+rating);
+        movie.setImdb_votes(movie.getImdb_votes()+1);
+        movieRepository.save(movie);
     }
 }

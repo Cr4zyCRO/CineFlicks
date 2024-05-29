@@ -86,22 +86,14 @@ public class HomeController {
 
     private void sortMovies(List<CinemaMovie> movies, String sortBy, String sortDir) {
         if (sortBy != null && !sortBy.isEmpty()) {
-            Comparator<CinemaMovie> comparator = null;
-            switch (sortBy) {
-                case "imdbRating":
-                    comparator = Comparator.comparing(cm -> cm.getMovie().getImdb_rating());
-                    break;
-                case "imdbVotes":
-                    comparator = Comparator.comparing(cm -> cm.getMovie().getImdb_votes());
-                    break;
-                case "runtime":
-                    comparator = Comparator.comparing(cm -> cm.getMovie().getRuntime());
-                    break;
-                default:
+            Comparator<CinemaMovie> comparator = switch (sortBy) {
+                case "imdbRating" -> Comparator.comparing(cm -> cm.getMovie().getImdb_rating());
+                case "imdbVotes" -> Comparator.comparing(cm -> cm.getMovie().getImdb_votes());
+                case "runtime" -> Comparator.comparing(cm -> cm.getMovie().getRuntime());
+                default ->
                     // Default sorting by movie title
-                    comparator = Comparator.comparing(cm -> cm.getMovie().getTitle());
-                    break;
-            }
+                        Comparator.comparing(cm -> cm.getMovie().getTitle());
+            };
 
             if (comparator != null) {
                 movies.sort(comparator);
@@ -118,7 +110,7 @@ public class HomeController {
         return movies.stream()
                 .collect(Collectors.groupingBy(
                         cm -> cm.getMovie().getTitle(),
-                        TreeMap::new,
+                        LinkedHashMap::new,
                         Collectors.groupingBy(cm -> cm.getStartTime().toLocalDate())
                 ));
     }

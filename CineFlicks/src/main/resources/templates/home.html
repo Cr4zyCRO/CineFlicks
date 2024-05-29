@@ -27,7 +27,7 @@
             </li>
             <!-- Conditionally render Admin Page link based on user's role -->
             <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a class="nav-link" href="/user/admin">Admin Page</a>
+                <a class="nav-link" href="/profile/admin">Admin Page</a>
             </li>
         </ul>
     </div>

@@ -12,9 +12,9 @@ import java.util.UUID;
 
 @Repository
 public interface CinemaMovieRepository extends JpaRepository<CinemaMovie, UUID> {
-    List<CinemaMovie> findAllByStartTimeBetween(LocalDateTime start, LocalDateTime end);
+
     @Query("SELECT cm FROM CinemaMovie cm WHERE cm.startTime BETWEEN :start AND :end ORDER BY cm.startTime ASC")
-    List<CinemaMovie> findAllByWeekSorted(LocalDateTime start, LocalDateTime end);
+    List<CinemaMovie> findAllByStartTimeBetween(LocalDateTime start, LocalDateTime end);
 
     List<CinemaMovie> findByCinema(Cinema cinema);
 }

@@ -1,0 +1,76 @@
+<!-- resources/templates/admin.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit Profile</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Include Bootstrap JS and Popper.js -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+</head>
+<body>
+<h2>Edit Profile</h2>
+<form id="edit-profile-form">
+    <label for="firstName">First Name:</label><br>
+    <input type="text" id="firstName" name="firstName" th:value="${user.getFirstName()}"><br>
+
+    <label for="lastName">Last Name:</label><br>
+    <input type="text" id="lastName" name="lastName" th:value="${user.getLastName()}"><br>
+
+    <label for="username">Email:</label><br>
+    <input type="text" id="username" name="username" th:value="${user.getUsername()}"><br>
+
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" th:value="${user.getEmail()}"><br>
+
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" value=""><br>
+
+    <label for="passwordConfirm">Confirm Password:</label><br>
+    <input type="password" id="passwordConfirm" name="passwordConfirm" value=""><br>
+
+    <button type="button" onclick="updateProfile()">Confirm</button>
+</form>
+
+<div id="update-message" style="display: none; color: green;">User info updated successfully!</div>
+
+<script>
+    function updateProfile() {
+        var userData = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            username: document.getElementById("username").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
+
+        var passwordConfirm = document.getElementById("passwordConfirm").value;
+
+        // Check if passwords match
+        if (userData.password !== passwordConfirm) {
+            alert("Passwords do not match");
+            return; // Exit the function if passwords do not match
+        }
+
+        // Send AJAX request to update user profile
+        $.ajax({
+            type: 'POST',
+            url: '/profile/update?passwordConfirm=' + encodeURIComponent(passwordConfirm),
+            contentType: 'application/json',
+            data: JSON.stringify(userData),
+            success: function(response) {
+                // Show success message
+                document.getElementById("update-message").style.display = "block";
+            },
+            error: function(xhr, status, error) {
+                // Log error message
+                console.error(error);
+            }
+        });
+    }
+</script>
+</body>
+</html>

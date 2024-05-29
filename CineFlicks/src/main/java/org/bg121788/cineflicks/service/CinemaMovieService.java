@@ -20,7 +20,7 @@ public class CinemaMovieService {
     private final CinemaMovieRepository cinemaMovieRepository;
 
     public List<CinemaMovie> getMoviesForThisWeek(String sortDir){
-        LocalDateTime start = LocalDateTime.now().with(ChronoField.DAY_OF_WEEK, 1);
+        LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusDays(7);
 
         List<CinemaMovie> movies = cinemaMovieRepository.findAllByStartTimeBetween(start, end);

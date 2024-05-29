@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<a th:href="@{/user/admin/add-movie}"> Add a new movie</a>
+<a th:href="@{/profile/admin/add-movie}"> Add a new movie</a>
 
 <div class="container mt-4">
     <h1>Movies</h1>
@@ -76,28 +76,71 @@
     </div>
 </div>
 
+
+<!-- Section to display top-rated movies -->
+<div class="container mt-4">
+    <h2>Top-Viewed Movies</h2>
+    <div class="row"> <!-- Bootstrap grid for responsive layout -->
+        <!-- Display top-rated movies as Bootstrap cards -->
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${topViewed}"> <!-- Responsive column sizes -->
+            <div class="card mb-4"> <!-- Bootstrap card component -->
+                <img th:src="${movie.getPoster()}" class="card-img-top" th:alt="${'Poster for ' + movie.getTitle()}"> <!-- Card image -->
+                <div class="card-body"> <!-- Card body -->
+                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
+
+                    <!-- Card content with number of votes, score, and awards -->
+                    <p class="card-text">
+                        <!-- Display IMDb rating -->
+                        <strong>IMDb Rating:</strong> <span th:text="${movie.getImdb_rating()}"></span><br>
+
+                        <!-- Display number of IMDb votes -->
+                        <strong>Votes:</strong> <span th:text="${movie.getImdb_votes()}"></span><br>
+                        <strong>Metascore:</strong> <span th:text="${movie.getMetascore()}"></span><br>
+                        <strong>Views in Cinema:</strong> <span th:text="${movie.getMovie_views()}"></span><br>
+
+
+                        <!-- Display awards, if available -->
+                        <strong>Awards:</strong> <span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span>
+                    </p>
+
+                    <!-- Action button to assign the movie to a cinema -->
+                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Section to display users -->
 <div class="container mt-4">
     <h2>Users</h2>
     <div class="table-responsive"> <!-- Make the table responsive -->
-        <table class="table table-bordered table-striped"> <!-- Bootstrap table -->
+        <table class="table table-bordered table-striped user-table"> <!-- Bootstrap table -->
             <thead>
             <tr>
                 <th>User ID</th>
                 <th>User Name</th>
                 <th>Email</th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="user : ${users}"> <!-- Loop through the list of users -->
-                <td th:text="${user.getId()}"></td> <!-- User ID -->
-                <td th:text="${user.getUsername()}"></td> <!-- User name -->
-                <td th:text="${user.getEmail()}"></td> <!-- Email -->
+            <tr th:each="user : ${users}">
+                <td th:text="${user.getId()}"></td>
+                <td th:text="${user.getUsername()}"></td>
+                <td th:text="${user.getEmail()}"></td>
+                <td>
+                    <button type="button" class="btn btn-danger delete-btn">Delete</button>
+                </td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
+
+
+
+
 
 <!-- Script to implement the filter and AJAX deletion -->
 <script>
@@ -116,6 +159,29 @@
         });
     }
 
+
+    $(document).ready(function() {
+        $('.delete-btn').click(function() {
+            var userId = $(this).closest('tr').find('td:first').text(); // Get the user ID from the first column
+            var username = $(this).closest('tr').find('td:eq(1)').text(); // Get the username
+
+            if (confirm("Are you sure you want to delete user " + username + "?")) {
+                // User confirmed, send AJAX request to delete user
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/profile/delete/' + userId,
+                    success: function(response) {
+                        // Reload the page after deletion
+                        window.location.reload(true);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText); // Log the error response
+                        alert('Error deleting user: ' + error);
+                    }
+                });
+            }
+        });
+    });
 </script>
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

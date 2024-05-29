@@ -86,6 +86,8 @@ public class TicketController {
 
         System.err.println(seatPrice + " Total: " + totalPrice + "\n");
 
+        movieService.updateViews(cinemaMovie.getMovie(), selectedSeatsList.size());
+
         // Create and populate the TicketDTO
         TicketDTO ticketDTO = new TicketDTO();
         ticketDTO.setUser(user);

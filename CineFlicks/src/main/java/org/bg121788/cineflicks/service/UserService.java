@@ -9,13 +9,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Data
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authenticationService;
 
     public void registerUser(UserDTO userDTO){
         User newUser = new User();
@@ -54,5 +59,46 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public void deleteUserById(UUID userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public void updateUser(UserDTO userDTO, String password) {
+        User user = convertToEntity(userDTO);
+
+        boolean isUpdated = updateIfChanged(user::getFirstName, user::setFirstName, userDTO.getFirstName())
+                | updateIfChanged(user::getLastName, user::setLastName, userDTO.getLastName())
+                | updateIfChanged(user::getUsername, user::setUsername, userDTO.getUsername())
+                | updateIfChanged(user::getEmail, user::setEmail, userDTO.getEmail())
+                | updatePasswordIfChanged(user, password);
+
+        if(isUpdated){
+            userRepository.save(user);
+        }
+    }
+
+    private boolean updateIfChanged(Supplier<String> getter, Consumer<String> setter, String newValue) {
+        if (!Objects.equals(getter.get(), newValue)) {
+            setter.accept(newValue);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean updatePasswordIfChanged(User user, String newPassword) {
+        String encodedPassword = authenticationService.getPasswordEncoder().encode(newPassword);
+
+        if (newPassword.isEmpty()){
+            user.setPassword(user.getPassword());
+            return true;
+        }
+
+        if (!encodedPassword.equals(user.getPassword())) {
+            user.setPassword(encodedPassword);
+            return true;
+        }
+        return false;
     }
 }

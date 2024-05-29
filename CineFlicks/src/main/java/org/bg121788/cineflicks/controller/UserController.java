@@ -15,14 +15,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @RestController
@@ -49,5 +47,36 @@ public class UserController {
         modelAndView.addObject("upcomingTickets", upcomingTickets);
 
         return modelAndView;
+    }
+
+    @GetMapping("/edit")
+    public ModelAndView editProfile(@AuthenticationPrincipal UserDetails userDetails ){
+        ModelAndView modelAndView = new ModelAndView("edit-profile");
+
+        // Fetch user info from UserService
+        UserDTO userDTO = userService.findByUsername(userDetails.getUsername());
+        modelAndView.addObject("user", userDTO);
+
+        return modelAndView;
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Void> updateProfile(@RequestBody UserDTO userDTO, @RequestParam String passwordConfirm) {
+        try {
+            if(userDTO.getPassword().equals(passwordConfirm))
+                userService.updateUser(userDTO, passwordConfirm);
+            else
+                throw new RuntimeException("Passwords do not match");
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        userService.deleteUserById(userId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

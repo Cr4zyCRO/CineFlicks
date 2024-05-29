@@ -1,11 +1,14 @@
 package org.bg121788.cineflicks.service;
 
+import ch.qos.logback.core.encoder.Encoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import org.bg121788.cineflicks.dto.UserDTO;
 import org.bg121788.cineflicks.repository.UserRepository;
+import org.bg121788.cineflicks.security.SecurityConfiguration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,7 @@ import java.util.Map;
 @Service
 public class AuthenticationService {
     private final UserRepository userRepository;
+    private final SecurityConfiguration securityConfiguration;
 
     public Map<String, String> processRegister(UserDTO user, String confirmPassword){
         Map<String, String> process = new HashMap<>();
@@ -42,5 +46,9 @@ public class AuthenticationService {
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
+    }
+
+    public PasswordEncoder getPasswordEncoder() {
+        return securityConfiguration.passwordEncoder();
     }
 }
