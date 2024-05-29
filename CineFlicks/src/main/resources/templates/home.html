@@ -9,29 +9,51 @@
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" th:href="@{/}">Movies This Week</a>
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <!-- Conditionally render Sign In button or Profile and Sign Out buttons -->
-                <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
                     <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/auth/logout">Sign Out</a>
-                </th:block>
-                <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
                     <a class="nav-link" href="/auth/login">Sign In</a>
-                </th:block>
-            </li>
-            <!-- Conditionally render Admin Page link based on user's role -->
-            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
-                <a class="nav-link" href="/profile/admin">Admin Page</a>
-            </li>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/auth/signup">Sign Up</a>
+                </li>
+            </th:block>
         </ul>
     </div>
 </nav>
+
+<header class="mt-5">
+    <div id="carouselExampleInterval" class="carousel slide position-relative" data-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Loop through each Announcement object -->
+            <th:block th:each="announcement, index : ${announcements}">
+                <div th:classappend="${index.index == 0} ? 'carousel-item active' : 'carousel-item'">
+                    <img th:src="${announcement.getMovie().getPoster()}" class="d-block w-100 img-fluid" alt="Announcement Image" style="max-height: 300px; object-fit: cover;">
+                    <div class="carousel-caption d-none d-md-block w-100 h-100" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); backdrop-filter: blur(2px); background-color: rgba(255, 255, 255, 0.5);">
+                        <h3 class="font-weight-bold mt-5  mb-0" style="font-size: 36px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); color: white;" >COMING SOON:</h3>
+                        <h5 class="font-weight-bold mt-5 mb-0" th:text="${announcement.getMovie().getTitle()}" style="font-size: 36px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); color: white;"></h5>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</header>
+
 
 
 <div class="container-fluid">
@@ -40,37 +62,34 @@
         <div class="col-md-3 bg-light aside-container">
             <!-- Filter options -->
             <div class="mb-3">
-                <h4>Filters:</h4>
+                <h4 class="mb-3">Filters:</h4>
                 <form id="filterForm">
                     <!-- Language filter -->
-                    <div>
+                    <div class="mb-3">
                         <h5>Languages:</h5>
-                        <div th:each="language : ${languages}">
-                            <label>
-                                <input type="checkbox" name="languages" th:value="${language}"> [[${language}]]
-                            </label>
+                        <div th:each="language : ${languages}" class="form-check">
+                            <input type="checkbox" class="form-check-input" name="languages" th:value="${language}" id="language[[${language}]]">
+                            <label class="form-check-label" for="language[[${language}]]">[[${language}]]</label>
                         </div>
                     </div>
                     <!-- Rating filter -->
-                    <div>
+                    <div class="mb-3">
                         <h5>Ratings:</h5>
-                        <div th:each="rating : ${ratings}">
-                            <label>
-                                <input type="radio" name="ratings" th:value="${rating}"> [[${rating}]]
-                            </label>
+                        <div th:each="rating : ${ratings}" class="form-check">
+                            <input type="radio" class="form-check-input" name="ratings" th:value="${rating}" id="rating[[${rating}]]">
+                            <label class="form-check-label" for="rating[[${rating}]]">[[${rating}]]</label>
                         </div>
                     </div>
                     <!-- Genre filter -->
-                    <div>
+                    <div class="mb-3">
                         <h5>Genres:</h5>
-                        <div th:each="genre : ${genres}">
-                            <label>
-                                <input type="checkbox" name="genres" th:value="${genre}"> [[${genre}]]
-                            </label>
+                        <div th:each="genre : ${genres}" class="form-check">
+                            <input type="checkbox" class="form-check-input" name="genres" th:value="${genre}" id="genre[[${genre}]]">
+                            <label class="form-check-label" for="genre[[${genre}]]">[[${genre}]]</label>
                         </div>
                     </div>
                     <!-- Apply button -->
-                    <button type="submit" id="applyButton" class="btn btn-primary">Apply</button>
+                    <button type="submit" id="applyButton" class="btn btn-success">Apply</button>
                 </form>
             </div>
         </div>
@@ -80,16 +99,16 @@
             <h1 class="mt-4">Movies Airing This Week</h1>
 
             <div class="mb-3">
-                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='title')}">
+                <a class="btn btn-outline-success" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='title')}">
                     Sort by Title
                 </a>
-                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbRating')}">
+                <a class="btn btn-outline-success" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbRating')}">
                     Sort by IMDb Rating
                 </a>
-                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbVotes')}">
+                <a class="btn btn-outline-success" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='imdbVotes')}">
                     Sort by IMDb Votes
                 </a>
-                <a class="btn btn-outline-primary" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='runtime')}">
+                <a class="btn btn-outline-success" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='runtime')}">
                     Sort by Runtime
                 </a>
                 <span th:text="${sortDir == 'ASC' ? 'Ascending' : 'Descending'}"></span>
@@ -103,20 +122,56 @@
                             <h4 th:text="${movieGroup.key}" class="mb-0">Movie Title</h4>
                         </div>
                         <div class="card-body">
-                            <div th:with="movie=${movieGroup.value.get(movieGroup.value.keySet().iterator().next()).get(0).getMovie()}"
-                                 class="movie-info">
-                                <span class="d-block">IMDb Rating: <span th:text="${movie.getImdb_rating()}"></span></span>
-                                <span class="d-block">IMDb Votes: <span th:text="${movie.getImdb_votes()}"></span></span>
-                                <span class="d-block">Runtime: <span th:text="${movie.getRuntime()}"></span></span>
-                                <span class="d-block">Rated: <span th:text="${movie.getRated()}"></span></span>
-                                <span class="d-block" th:each="genre : ${movie.getGenre()}">Genre: <span th:text="${genre.getGenre()} + ' '"></span></span>
-                                <span class="d-block" th:each="language : ${movie.getLanguage()}">Language: <span th:text="${language.getLanguage()} + ' '"></span></span>
+
+                            <div th:with="movie=${movieGroup.value.get(movieGroup.value.keySet().iterator().next()).get(0).getMovie()}" class="movie-info">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">IMDb Rating:</span>
+                                            <span th:text="${#numbers.formatDecimal(movie.getImdb_rating(), 0, 'COMMA', 1, 'POINT')}"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">IMDb Votes:</span>
+                                            <span th:text="${movie.getImdb_votes()}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">Runtime:</span>
+                                            <span th:text="${movie.getRuntime()}"></span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">Rated:</span>
+                                            <span th:text="${movie.getRated()}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">Language:</span>
+                                            <span th:each="language, iterStat : ${movie.getLanguage()}">
+                                                <span th:text="${language.getLanguage()}"></span>
+                                                <span th:if="${!iterStat.last}">,</span>
+                                            </span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="font-weight-bold">Genre:</span>
+                                            <span th:each="genre, iterStat : ${movie.getGenre()}">
+                                                <span th:text="${genre.getGenre()}"></span>
+                                                <span th:if="${!iterStat.last}">,</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+
                             <h4 class="mt-4">Showtimes:</h4>
                             <div th:each="dateGroup : ${movieGroup.value}">
-                                <h5 th:text="${#temporals.format(dateGroup.key, 'yyyy-MM-dd')}" class="mt-3">Date</h5>
+                                <h5 th:text="${#temporals.format(dateGroup.key, 'MMMM dd, yyyy')}" class="mt-3">Date</h5>
                                 <div th:each="cinemaMovie : ${dateGroup.value}">
-                                    <a class="btn btn-secondary mt-2"
+                                    <a class="btn btn-success mt-2"
                                        th:href="@{/ticket/{cinemaMovieId}(cinemaMovieId=${cinemaMovie.getId()})}"
                                        th:text="'Room ' + ${cinemaMovie.getCinema().getRoom()} + ' - ' + ${#temporals.format(cinemaMovie.getStartTime(), 'HH:mm')}">
                                     </a>
@@ -129,6 +184,14 @@
         </div>
     </div>
 </div>
+
+
+
+
+
+
+
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>

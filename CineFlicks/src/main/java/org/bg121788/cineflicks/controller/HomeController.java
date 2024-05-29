@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.entity.CinemaMovie;
 import org.bg121788.cineflicks.entity.Language;
 import org.bg121788.cineflicks.entity.Genre;
+import org.bg121788.cineflicks.service.AnnouncementService;
 import org.bg121788.cineflicks.service.CinemaMovieService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/")
 public class HomeController {
     private final CinemaMovieService cinemaMovieService;
+    private final AnnouncementService announcementService;
 
     @GetMapping
     public ModelAndView mainView(
@@ -61,6 +63,8 @@ public class HomeController {
         // Add filter options and grouped movies to the view
         modelAndView.addObject("groupedMovies", groupedMovies);
         modelAndView.addObject("sortDir", sortDir);
+        modelAndView.addObject("announcements", announcementService.getAllAnnouncements());
+
 
 
         return modelAndView;

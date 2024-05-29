@@ -2,12 +2,9 @@ package org.bg121788.cineflicks.service;
 
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.TicketDTO;
-import org.bg121788.cineflicks.entity.User;
-import org.bg121788.cineflicks.repository.TicketRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.bg121788.cineflicks.entity.Ticket;
+import org.bg121788.cineflicks.repository.TicketRepository;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;

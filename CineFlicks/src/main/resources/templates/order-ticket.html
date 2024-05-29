@@ -66,44 +66,142 @@
     </style>
 </head>
 <body>
-<div class="container mt-4">
-    <h1>Order Tickets</h1>
 
-    <div>
-        <h2 th:text="${cinemaMovie.getMovie().getTitle()}"></h2>
-        <p th:text="'Date: ' + ${#temporals.format(cinemaMovie.getStartTime(), 'yyyy-MM-dd')}"></p>
-        <p th:text="'Time: ' + ${#temporals.format(cinemaMovie.getStartTime(), 'HH:mm')}"></p>
-        <p th:text="'Room: ' + ${cinemaMovie.getCinema().getRoom()}"></p>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Sign Out</a>
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/login}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/register}">Sign Up</a>
+                </li>
+            </th:block>
+
+        </ul>
     </div>
+</nav>
 
-    <form id="ticket-form" onsubmit="return false;">
-        <h3>Available Seats</h3>
-        <div class="seat-grid"> <!-- Grid layout with rows and columns -->
-            <!-- Loop through rows -->
-            <div th:each="row : ${rowLabels}" class="seat-row"> <!-- Defines each row -->
-                <!-- Loop through columns within each row -->
-                <div th:each="col : ${#numbers.sequence(1, cinemaMovie.getCinema().getColumn())}">
-                    <div class="seat-checkbox-container">
-                        <input type="checkbox"
-                               th:name="seat"
-                               th:value="${row + T(java.lang.String).format('%02d', col)}"
-                               th:id="${row + T(java.lang.String).format('%02d', col)}"
-                               th:disabled="${#lists.contains(takenSeats, row + T(java.lang.String).format('%02d', col))}"
-                               class="seat-checkbox"/>
+<h1 class="mb-4 text-center font-weight-bold mt-5">Order Tickets</h1>
 
-                        <label th:for="${row + T(java.lang.String).format('%02d', col)}"
-                               class="seat-label"
-                               th:text="${row + T(java.lang.String).format('%02d', col)}"></label>
+<div class="container w-100">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card w-75">
+                <div class="card-header">
+                    <h2 class="card-title font-weight-bold" th:text="${cinemaMovie.getMovie().getTitle()}"></h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <!-- Plot -->
+                            <p class="card-text mb-2"><span th:text="${cinemaMovie.getMovie().getPlot()}"></span></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <h6 class="font-weight-bold">Room:</h6>
+                            <p class="card-text mb-2"><span th:text="${cinemaMovie.getCinema().getRoom()}"></span></p>
+                            <h6 class="font-weight-bold">Seat Price:</h6>
+                            <p class="card-text mb-2"><span th:text="${cinemaMovie.getSeatPrice()}"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="font-weight-bold">Start time:</h6>
+                            <p class="card-text mb-2"><span th:text="${#temporals.format(cinemaMovie.getStartTime(),'MMMM dd, yyyy  HH:mm')}"></span></p>
+                            <h6 class="font-weight-bold">Duration:</h6>
+                            <p class="card-text mb-2"><span th:text="${cinemaMovie.getMovie().getRuntime()}"></span></p>
+
+                        </div>
+                    </div>
+                    <hr> <!-- Visible dividing line -->
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Genre -->
+                            <div class="mb-3">
+                                <span class="font-weight-bold">Writers:</span>
+                                <span th:each="writer, iterStat : ${cinemaMovie.getMovie().getWriter()}">
+                                    <span th:text="${writer.getWriter()}"></span>
+                                    <span th:if="${!iterStat.last}">,</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Language -->
+                            <div class="mb-3">
+                                <span class="font-weight-bold">Actors:</span>
+                                <span th:each="actor, iterStat : ${cinemaMovie.getMovie().getActor()}">
+                                    <span th:text="${actor.getActor()}"></span>
+                                    <span th:if="${!iterStat.last}">,</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="card-text mb-2"><strong>IMDb Rating:</strong> <span th:text="${cinemaMovie.getMovie().getImdb_rating()}"></span></p>
+
+                        </div>
+                        <div class="col-md-6">
+                            <p class="card-text mb-2"><strong>Rated:</strong> <span th:text="${cinemaMovie.getMovie().getRated()}"></span></p>
+
+                        </div>
                     </div>
                 </div>
-            </div> <!-- End of a row -->
+            </div>
         </div>
-        <input type="hidden" id="cinemaMovieId" th:value="${cinemaMovie.getId()}">
+        <div class="col-md-6">
+            <div class="row">
+                <form id="ticket-form" onsubmit="return false;">
+                    <h3 class="text-center font-weight-bold">Available Seats</h3>
+                    <div class="seat-grid">
+                        <div th:each="row : ${rowLabels}" class="seat-row">
+                            <div th:each="col : ${#numbers.sequence(1, cinemaMovie.getCinema().getColumn())}">
+                                <div class="seat-checkbox-container">
+                                    <input type="checkbox"
+                                           th:name="seat"
+                                           th:value="${row + T(java.lang.String).format('%02d', col)}"
+                                           th:id="${row + T(java.lang.String).format('%02d', col)}"
+                                           th:disabled="${#lists.contains(takenSeats, row + T(java.lang.String).format('%02d', col))}"
+                                           class="seat-checkbox"/>
 
-        <button class="btn btn-primary" onclick="submitForm()">Buy Tickets</button>
-    </form>
-
-    <div id="message"></div>
+                                    <label th:for="${row + T(java.lang.String).format('%02d', col)}"
+                                           class="seat-label"
+                                           th:text="${row + T(java.lang.String).format('%02d', col)}"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="cinemaMovieId" th:value="${cinemaMovie.getId()}">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-success mt-5 mr-2" onclick="submitForm()">Buy Tickets</button>
+                        <div id="message" class="p-2 rounded mt-5"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         function submitForm() {
@@ -122,10 +220,10 @@
                     selectedSeats: selectedSeats
                 }),
                 success: function(response) {
-                    $("#message").text("Success: " + response);
+                    $("#message").text("Success: " + response).removeClass('alert-danger').addClass('alert-success');
                 },
                 error: function(error) {
-                    $("#message").text("Error: " + error.responseText);
+                    $("#message").text("Error: " + error.responseText).removeClass('alert-success').addClass('alert-danger');
                 }
             });
         }

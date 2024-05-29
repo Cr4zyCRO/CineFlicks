@@ -17,4 +17,6 @@ public interface MovieRepository extends JpaRepository<Movie, UUID> {
 
     @Query("SELECT m FROM Movie m ORDER BY m.movie_views DESC LIMIT 10")
     List<Movie> findTop10ByOrderByImdb_votesDesc();
+
+    List<Movie> findByTitleContainingIgnoreCase(String title);
 }

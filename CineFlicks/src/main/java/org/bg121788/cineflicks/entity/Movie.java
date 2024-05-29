@@ -1,7 +1,6 @@
 package org.bg121788.cineflicks.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Unsigned;
 import lombok.Data;
 
 import java.util.List;

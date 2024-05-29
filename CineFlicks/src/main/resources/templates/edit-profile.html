@@ -11,31 +11,94 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
 </head>
-<body>
-<h2>Edit Profile</h2>
-<form id="edit-profile-form">
-    <label for="firstName">First Name:</label><br>
-    <input type="text" id="firstName" name="firstName" th:value="${user.getFirstName()}"><br>
+<body class="d-flex flex-column align-items-center justify-content-center">
 
-    <label for="lastName">Last Name:</label><br>
-    <input type="text" id="lastName" name="lastName" th:value="${user.getLastName()}"><br>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/profile/admin/add-movie}"> New Movie</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/announcement}"> Create Announcement</a>
+            </li>
 
-    <label for="username">Email:</label><br>
-    <input type="text" id="username" name="username" th:value="${user.getUsername()}"><br>
+        </ul>
 
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" th:value="${user.getEmail()}"><br>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" href="/profile/admin">Admin Page</a>
+            </li>
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Sign Out</a>
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/login}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/register}">Sign Up</a>
+                </li>
+            </th:block>
 
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" value=""><br>
+        </ul>
+    </div>
+</nav>
 
-    <label for="passwordConfirm">Confirm Password:</label><br>
-    <input type="password" id="passwordConfirm" name="passwordConfirm" value=""><br>
+<div class="row g-0 vh-100 bg-light w-75 mt-5 ">
+    <div class="col-md-6 d-flex align-items-center justify-content-center">
+        <div class="px-5">
+            <div class="text-center mb-5">
+                <h2 class="registration-header card-title font-weight-bold">
+                    Edit Profile
+                </h2>
+            </div>
+            <form id="edit-profile-form" class="row g-3 p-4 bg-light">
+                <div class="col-12">
+                    <label for="firstName" class="form-label">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" class="form-control mb-2 rounded-pill" th:value="${user.getFirstName()}">
+                </div>
+                <div class="col-12">
+                    <label for="lastName" class="form-label">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" class="form-control mb-2 rounded-pill" th:value="${user.getLastName()}">
+                </div>
+                <div class="col-12">
+                    <label for="username" class="form-label">Email:</label>
+                    <input type="text" id="username" name="username" class="form-control mb-2 rounded-pill" th:value="${user.getUsername()}">
+                </div>
+                <div class="col-12">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control mb-2 rounded-pill" th:value="${user.getEmail()}">
+                </div>
+                <div class="col-12">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" id="password" name="password" class="form-control mb-2 rounded-pill">
+                </div>
+                <div class="col-12">
+                    <label for="passwordConfirm" class="form-label">Confirm Password:</label>
+                    <input type="password" id="passwordConfirm" name="passwordConfirm" class="form-control mb-2 rounded-pill">
+                </div>
+                <div class="col-12">
+                    <button type="button" onclick="updateProfile()" class="btn btn-success w-100 rounded-pill">Confirm</button>
+                </div>
+                <div id="update-message" class="alert-success mt-3 w-100 rounded p-1 text-center" style="display: none;">User info updated successfully!</div>
+            </form>
+        </div>
+    </div>
+</div>
 
-    <button type="button" onclick="updateProfile()">Confirm</button>
-</form>
-
-<div id="update-message" style="display: none; color: green;">User info updated successfully!</div>
 
 <script>
     function updateProfile() {

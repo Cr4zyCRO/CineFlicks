@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.TicketDTO;
 import org.bg121788.cineflicks.dto.UserDTO;
 import org.bg121788.cineflicks.entity.CinemaMovie;
-import org.bg121788.cineflicks.entity.User;
 import org.bg121788.cineflicks.service.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,7 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 

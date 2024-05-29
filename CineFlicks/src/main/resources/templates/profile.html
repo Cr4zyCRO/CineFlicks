@@ -13,8 +13,43 @@
 
 </head>
 <body>
-<div class="card">
-    <div class="card-body">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" href="/profile/admin">Admin Page</a>
+            </li>
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Sign Out</a>
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/login}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/register}">Sign Up</a>
+                </li>
+            </th:block>
+
+        </ul>
+    </div>
+</nav>
+
+<div class="card mt-5">
+    <div class="card-body mt-3">
         <h2 class="card-title">
             <span th:text="${user.getFirstName() + ' ' + user.getLastName()}">Full Name</span>
             <small class="text-muted" th:text="${'(' + user.getRole() + ')'}">(Role)</small>
@@ -28,74 +63,154 @@
             <strong>Email:</strong> <span th:text="${user.getEmail()}">Email</span>
         </p>
 
-        <a class="fancyButton btn btn-success" th:href="@{/profile/edit}" th:text="'Edit Profile'"></a>
+        <a class="btn btn-success" th:href="@{/profile/edit}" th:text="'Edit Profile'"></a>
     </div>
 </div>
 
-<!-- Watched Tickets -->
+
+<!-- Tickets Section -->
 <div class="container mt-4">
-    <h2>Watched Tickets</h2>
-    <div class="mb-4">
-        <input type="text" id="watched-search-bar" class="form-control" placeholder="Search watched tickets..." onkeyup="filterWatchedTickets()">
-    </div>
-    <div class="row" id="watched-tickets">
-        <div class="col-lg-6 col-md-12 col-sm-12 watched-tickets-container " th:each="ticket: ${watchedTickets}" th:id="'movie-' + ${ticket.getId()}">
-            <div class="card ticket-card">
-                <div class="row no-gutters">
-                    <!-- Left side for information -->
-                    <div class="col-md-8 d-flex flex-column">
-                        <div class="card-body">
-                            <div class="card-title">
-                                <h4 class="font-weight-bold" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h4>
-                                <span class="disabled">movie</span>
-                            </div>
+    <div class="row">
+        <!-- Watched Tickets -->
+        <div class="col-md-6">
+            <h2>Watched Tickets</h2>
+            <div class="mb-4">
+                <input type="text" id="watched-search-bar" class="form-control" placeholder="Search watched tickets..." onkeyup="filterWatchedTickets()">
+            </div>
+            <div class="row" id="watched-tickets">
+                <div class="col-lg-12 col-md-12 col-sm-12 watched-tickets-container " th:each="ticket: ${watchedTickets}" th:id="'movie-' + ${ticket.getId()}">
+                    <div class="card ticket-card">
+                        <div class="row no-gutters">
+                            <!-- Left side for information -->
+                            <div class="col-md-8 d-flex flex-column">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <h4 class="font-weight-bold" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h4>
+                                        <span class="disabled">movie</span>
+                                    </div>
 
-                            <div class="card-text">
-                                <h6 th:text="${ticket.getUser().getFirstName() + ' ' + ticket.getUser().getLastName()}"></h6>
-                                <span class="disabled">owner</span>
-                            </div>
+                                    <div class="card-text">
+                                        <h6 th:text="${ticket.getUser().getFirstName() + ' ' + ticket.getUser().getLastName()}"></h6>
+                                        <span class="disabled">owner</span>
+                                    </div>
 
-                            <div class="card-text date">
-                                <h6 th:text="${#temporals.format(ticket.getCinemaMovie().getStartTime(), 'MMMM dd, yyyy')}"></h6>
-                                <span class="disabled">date</span>
-                            </div>
+                                    <div class="card-text date">
+                                        <h6 th:text="${#temporals.format(ticket.getCinemaMovie().getStartTime(), 'MMMM dd, yyyy')}"></h6>
+                                        <span class="disabled">date</span>
+                                    </div>
 
-                            <div class="card-text runtime">
-                                <h6 th:text="${ticket.getCinemaMovie().getMovie().getRuntime()}"></h6>
-                                <span class="disabled">duration</span>
-                            </div>
+                                    <div class="card-text runtime">
+                                        <h6 th:text="${ticket.getCinemaMovie().getMovie().getRuntime()}"></h6>
+                                        <span class="disabled">duration</span>
+                                    </div>
 
-                            <div class="card-text seats">
-                                <h6 th:text="${ticket.getSelectedSeats()}"></h6>
-                                <span class="disabled">seats</span>
+                                    <div class="card-text seats">
+                                        <h6 th:text="${ticket.getSelectedSeats()}"></h6>
+                                        <span class="disabled">seats</span>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1"></div> <!-- Flex grow to fill remaining space -->
+                            </div>
+                            <!-- Right side for price and barcode -->
+                            <div class="col-md-4 d-flex flex-column card-footer">
+                                <div class="d-flex flex-column  flex-md-column flex-sm-row w-100">
+                                    <!-- Price Display -->
+                                    <div class="d-flex justify-content-center align-items-center flex-grow-2 w-100 p-2">
+                                        <div class="text-center">
+                                            <h6 class="price font-weight-bold text-white" th:text="${ticket.getPrice()}"> </h6>
+                                            <span class="disabled text-white">euro</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rating Display -->
+                                    <div class="d-flex justify-content-center align-items-center flex-grow-1 w-100 p-2">
+                                        <div class="rating">
+                                            <form method="post" th:action="@{/movie/{id}/rating(id=${ticket.getCinemaMovie().getMovie().getId()})}">
+                                                <div class="input-group">
+                                                    <input type="number" id="rating" name="rating" class="form-control" min="0" max="10" step="1" />
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-success">Rate</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Barcode Display -->
+                                    <div class="d-flex justify-content-center align-items-start flex-grow-1 w-100 p-2">
+                                        <div class="barcode"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex-grow-1"></div> <!-- Flex grow to fill remaining space -->
                     </div>
-                    <!-- Right side for price and barcode -->
-                    <div class="col-md-4 d-flex flex-column card-footer">
-                        <div class="d-flex flex-column  flex-md-column flex-sm-row w-100">
-                            <!-- Price Display -->
-                            <div class="d-flex justify-content-center align-items-center flex-grow-2 w-100 p-2">
-                                <div class="text-center">
-                                    <h6 class="price font-weight-bold text-white" th:text="${ticket.getPrice()}"> </h6>
-                                    <span class="disabled text-white">euro</span>
-                                </div>
-                            </div>
+                </div>
+            </div>
+        </div>
 
-                            <!-- Rating Display -->
-                            <div class="d-flex justify-content-center align-items-center flex-grow-1 w-100 p-2">
-                                <div class="rating">
-                                    <form method="post" th:action="@{/movie/{id}/rating(id=${ticket.getCinemaMovie().getMovie().getId()})}">
-                                        <input  type="number" id="rating" name="rating" min="0" max="5" step="1" />
-                                        <button type="submit">Rate</button>
-                                    </form>
-                                </div>
-                            </div>
+        <!-- Upcoming Tickets -->
+        <div class="col-md-6">
+            <h2>Upcoming Tickets</h2>
+            <div class="mb-4">
+                <input type="text" id="upcoming-search-bar" class="form-control" placeholder="Search upcoming tickets..." onkeyup="filterUpcomingTickets()">
+            </div>
+            <div class="row" id="upcoming-tickets">
+                <div class="col-lg-12 col-md-12 col-sm-12 upcoming-tickets-container " th:each="ticket: ${upcomingTickets}" th:id="'movie-' + ${ticket.getId()}">
+                    <div class="card ticket-card">
+                        <div class="row no-gutters">
+                            <!-- Left side for information -->
+                            <div class="col-md-8 d-flex flex-column">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <h4 class="font-weight-bold" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h4>
+                                        <span class="disabled">movie</span>
+                                    </div>
 
-                            <!-- Barcode Display -->
-                            <div class="d-flex justify-content-center align-items-start flex-grow-1 w-100 p-2">
-                                <div class="barcode"></div>
+                                    <div class="card-text">
+                                        <h6 th:text="${ticket.getUser().getFirstName() + ' ' + ticket.getUser().getLastName()}"></h6>
+                                        <span class="disabled">owner</span>
+                                    </div>
+
+                                    <div class="card-text date">
+                                        <h6 th:text="${#temporals.format(ticket.getCinemaMovie().getStartTime(), 'MMMM dd, yyyy - HH:mm')}"></h6>
+                                        <span class="disabled">date</span>
+                                    </div>
+
+                                    <div class="card-text runtime">
+                                        <h6 th:text="${ticket.getCinemaMovie().getMovie().getRuntime()}"></h6>
+                                        <span class="disabled">duration</span>
+                                    </div>
+
+                                    <div class="card-text seats">
+                                        <h6 th:text="${ticket.getSelectedSeats()}"></h6>
+                                        <span class="disabled">seats</span>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1"></div> <!-- Flex grow to fill remaining space -->
+                            </div>
+                            <!-- Right side for price and barcode -->
+                            <div class="col-md-4 d-flex flex-column card-footer">
+                                <div class="d-flex flex-column  flex-md-column flex-sm-row w-100">
+                                    <!-- Price Display -->
+                                    <div class="d-flex justify-content-center align-items-center flex-grow-2 w-100 p-2">
+                                        <div class="text-center">
+                                            <h6 class="price font-weight-bold text-white" th:text="${ticket.getPrice()}"> </h6>
+                                            <span class="disabled text-white">euro</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rating Display -->
+                                    <div class="d-flex justify-content-center align-items-center flex-grow-1 w-100 p-2">
+                                        <div class="rating">
+                                            <!-- Your rating component here -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Barcode Display -->
+                                    <div class="d-flex justify-content-center align-items-start flex-grow-1 w-100 p-2">
+                                        <div class="barcode"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -107,75 +222,7 @@
 
 
 
-<!-- Upcoming Tickets -->
-<div class="container mt-4">
-    <h2>Watched Tickets</h2>
-    <div class="mb-4">
-        <input type="text" id="upcoming-search-bar" class="form-control" placeholder="Search upcoming tickets..." onkeyup="filterUpcomingTickets()">
-    </div>
-    <div class="row" id="upcoming-tickets">
-        <div class="col-lg-6 col-md-12 col-sm-12 upcoming-tickets-container " th:each="ticket: ${upcomingTickets}" th:id="'movie-' + ${ticket.getId()}">
-            <div class="card ticket-card">
-                <div class="row no-gutters">
-                    <!-- Left side for information -->
-                    <div class="col-md-8 d-flex flex-column">
-                        <div class="card-body">
-                            <div class="card-title">
-                                <h4 class="font-weight-bold" th:text="${ticket.getCinemaMovie().getMovie().getTitle()}"></h4>
-                                <span class="disabled">movie</span>
-                            </div>
 
-                            <div class="card-text">
-                                <h6 th:text="${ticket.getUser().getFirstName() + ' ' + ticket.getUser().getLastName()}"></h6>
-                                <span class="disabled">owner</span>
-                            </div>
-
-                            <div class="card-text date">
-                                <h6 th:text="${#temporals.format(ticket.getCinemaMovie().getStartTime(), 'MMMM dd, yyyy - HH:mm')}"></h6>
-                                <span class="disabled">date</span>
-                            </div>
-
-                            <div class="card-text runtime">
-                                <h6 th:text="${ticket.getCinemaMovie().getMovie().getRuntime()}"></h6>
-                                <span class="disabled">duration</span>
-                            </div>
-
-                            <div class="card-text seats">
-                                <h6 th:text="${ticket.getSelectedSeats()}"></h6>
-                                <span class="disabled">seats</span>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1"></div> <!-- Flex grow to fill remaining space -->
-                    </div>
-                    <!-- Right side for price and barcode -->
-                    <div class="col-md-4 d-flex flex-column card-footer">
-                        <div class="d-flex flex-column  flex-md-column flex-sm-row w-100">
-                            <!-- Price Display -->
-                            <div class="d-flex justify-content-center align-items-center flex-grow-2 w-100 p-2">
-                                <div class="text-center">
-                                    <h6 class="price font-weight-bold text-white" th:text="${ticket.getPrice()}"> </h6>
-                                    <span class="disabled text-white">euro</span>
-                                </div>
-                            </div>
-
-                            <!-- Rating Display -->
-                            <div class="d-flex justify-content-center align-items-center flex-grow-1 w-100 p-2">
-                                <div class="rating">
-                                    <!-- Your rating component here -->
-                                </div>
-                            </div>
-
-                            <!-- Barcode Display -->
-                            <div class="d-flex justify-content-center align-items-start flex-grow-1 w-100 p-2">
-                                <div class="barcode"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <script>

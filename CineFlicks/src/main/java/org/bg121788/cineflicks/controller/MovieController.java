@@ -3,11 +3,11 @@ package org.bg121788.cineflicks.controller;
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.service.MovieService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,7 +36,13 @@ public class MovieController {
         // Delete the movie
         movieOptional.ifPresent(movie -> movieService.updateRating(movie, rating));
 
-        return new ModelAndView("redirect:/profile/admin");
+        return new ModelAndView("redirect:/profile");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Movie>> searchMovies(@RequestParam String query) {
+        List<Movie> movies = movieService.searchMovies(query);
+        return ResponseEntity.ok(movies);
     }
 
 

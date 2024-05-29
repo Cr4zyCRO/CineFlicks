@@ -17,4 +17,7 @@ public interface CinemaMovieRepository extends JpaRepository<CinemaMovie, UUID> 
     List<CinemaMovie> findAllByStartTimeBetween(LocalDateTime start, LocalDateTime end);
 
     List<CinemaMovie> findByCinema(Cinema cinema);
+
+    @Query("SELECT cm FROM CinemaMovie cm WHERE cm.startTime > :start ORDER BY cm.startTime ASC")
+    List<CinemaMovie> findAllByStartTimeBeforeNow(LocalDateTime start);
 }

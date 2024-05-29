@@ -37,7 +37,7 @@ public class CinemaController {
 
         modelAndView.addObject("cinemas",cinemas);
         modelAndView.addObject("movie",movie);
-        modelAndView.addObject("cinemaMovies", cinemaMovieService.getAllCinemaMovies());
+        modelAndView.addObject("cinemaMovies", cinemaMovieService.getCinemaMovies());
 
         return modelAndView;
     }

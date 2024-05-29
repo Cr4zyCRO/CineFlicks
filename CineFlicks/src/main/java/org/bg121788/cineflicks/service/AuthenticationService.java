@@ -1,6 +1,5 @@
 package org.bg121788.cineflicks.service;
 
-import ch.qos.logback.core.encoder.Encoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;

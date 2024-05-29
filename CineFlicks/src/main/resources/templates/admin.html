@@ -13,103 +13,50 @@
 </head>
 <body>
 
-<a th:href="@{/profile/admin/add-movie}"> Add a new movie</a>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/profile/admin/add-movie}"> New Movie</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/announcement}"> Create Announcement</a>
+            </li>
 
-<div class="container mt-4">
-    <h1>Movies</h1>
+        </ul>
 
-    <!-- Search bar to filter movies -->
-    <div class="mb-4">
-        <input type="text" id="search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterMovies()">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" href="/profile/admin">Admin Page</a>
+            </li>
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Sign Out</a>
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/login}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/register}">Sign Up</a>
+                </li>
+            </th:block>
+
+        </ul>
     </div>
+</nav>
 
-    <div class="row" id="movie-list"> <!-- Bootstrap grid structure -->
-        <!-- Loop through movies and display as cards -->
-        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${movies}" th:id="'movie-' + ${movie.getId()}"> <!-- Responsive columns -->
-            <div class="card mb-4"> <!-- Bootstrap card component -->
-                <div class="card-body"> <!-- Card content -->
-                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
-                    <p class="card-text">Rated: <span th:text="${movie.getRated()}"></span></p> <!-- Rated -->
-                    <p class="card-text">Runtime: <span th:text="${movie.getRuntime()}"></span></p> <!-- Runtime -->
-                    <p class="card-text">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()} + ' '"></span></p> <!-- Genres -->
-                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
-
-
-                    <form th:action="@{/movie/{id}(id=${movie.getId()})}" method="post"  class="ml-auto">
-                        <input type="hidden" name="_method" value="post"/>
-                        <button type="submit" class="btn btn-danger">Remove</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Section to display top-rated movies -->
-<div class="container mt-4">
-    <h2>Top-Rated Movies</h2>
-    <div class="row"> <!-- Bootstrap grid for responsive layout -->
-        <!-- Display top-rated movies as Bootstrap cards -->
-        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${topRated}"> <!-- Responsive column sizes -->
-            <div class="card mb-4"> <!-- Bootstrap card component -->
-                <img th:src="${movie.getPoster()}" class="card-img-top" th:alt="${'Poster for ' + movie.getTitle()}"> <!-- Card image -->
-                <div class="card-body"> <!-- Card body -->
-                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
-
-                    <!-- Card content with number of votes, score, and awards -->
-                    <p class="card-text">
-                        <!-- Display IMDb rating -->
-                        <strong>IMDb Rating:</strong> <span th:text="${movie.getImdb_rating()}"></span><br>
-
-                        <!-- Display number of IMDb votes -->
-                        <strong>Votes:</strong> <span th:text="${movie.getImdb_votes()}"></span><br>
-
-                        <!-- Display awards, if available -->
-                        <strong>Awards:</strong> <span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span>
-                    </p>
-
-                    <!-- Action button to assign the movie to a cinema -->
-                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Section to display top-rated movies -->
-<div class="container mt-4">
-    <h2>Top-Viewed Movies</h2>
-    <div class="row"> <!-- Bootstrap grid for responsive layout -->
-        <!-- Display top-rated movies as Bootstrap cards -->
-        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${topViewed}"> <!-- Responsive column sizes -->
-            <div class="card mb-4"> <!-- Bootstrap card component -->
-                <img th:src="${movie.getPoster()}" class="card-img-top" th:alt="${'Poster for ' + movie.getTitle()}"> <!-- Card image -->
-                <div class="card-body"> <!-- Card body -->
-                    <h5 class="card-title" th:text="${movie.getTitle()}"></h5> <!-- Movie title -->
-
-                    <!-- Card content with number of votes, score, and awards -->
-                    <p class="card-text">
-                        <!-- Display IMDb rating -->
-                        <strong>IMDb Rating:</strong> <span th:text="${movie.getImdb_rating()}"></span><br>
-
-                        <!-- Display number of IMDb votes -->
-                        <strong>Votes:</strong> <span th:text="${movie.getImdb_votes()}"></span><br>
-                        <strong>Metascore:</strong> <span th:text="${movie.getMetascore()}"></span><br>
-                        <strong>Views in Cinema:</strong> <span th:text="${movie.getMovie_views()}"></span><br>
-
-
-                        <!-- Display awards, if available -->
-                        <strong>Awards:</strong> <span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span>
-                    </p>
-
-                    <!-- Action button to assign the movie to a cinema -->
-                    <a class="btn btn-primary" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Section to display users -->
 <div class="container mt-4">
@@ -121,6 +68,7 @@
                 <th>User ID</th>
                 <th>User Name</th>
                 <th>Email</th>
+                <th>Role</th>
                 <th>Action</th>
             </tr>
             </thead>
@@ -129,6 +77,7 @@
                 <td th:text="${user.getId()}"></td>
                 <td th:text="${user.getUsername()}"></td>
                 <td th:text="${user.getEmail()}"></td>
+                <td th:text="${user.getRole()}"></td>
                 <td>
                     <button type="button" class="btn btn-danger delete-btn">Delete</button>
                 </td>
@@ -137,6 +86,98 @@
         </table>
     </div>
 </div>
+
+
+
+
+<div class="container mt-5">
+    <h1 class="text-center font-weight-bold">Movies</h1>
+
+    <!-- Search bar to filter movies -->
+    <div class="mb-4">
+        <input type="text" id="search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterMovies()">
+    </div>
+
+    <div class="row" id="movie-list">
+        <!-- Loop through movies and display as cards -->
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${movies}" th:id="'movie-' + ${movie.getId()}">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center font-weight-bold" th:text="${movie.getTitle()}"></h5>
+                    <p class="card-text text-center">Rated: <span th:text="${movie.getRated()}"></span></p>
+                    <p class="card-text text-center">Runtime: <span th:text="${movie.getRuntime()}"></span></p>
+                    <p class="card-text text-center">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()} + ' '"></span></p>
+                    <div class="text-center">
+                        <a class="btn btn-success" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
+                        <form th:action="@{/movie/{id}(id=${movie.getId()})}" method="post" class="d-inline-block ml-2">
+                            <input type="hidden" name="_method" value="post"/>
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="text-center font-weight-bold">Top-Rated Movies</h2>
+            <div class="table-responsive">
+                <table class="table table-striped text-center">
+                    <thead>
+                    <tr>
+                        <th>Movie</th>
+                        <th>IMDb Rating</th>
+                        <th>Awards</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="movie : ${topRated}">
+                        <td>
+                            <img th:src="${movie.getPoster()}" alt="Poster" class="img-thumbnail">
+                            <span th:text="${movie.getTitle()}" class="font-weight-bold d-block mt-2"></span>
+                        </td>
+                        <td><span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}"></span></td>
+                        <td><span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h2 class="text-center font-weight-bold">Top-Viewed Movies</h2>
+            <div class="table-responsive">
+                <table class="table table-striped text-center">
+                    <thead>
+                    <tr>
+                        <th>Movie</th>
+                        <th>IMDb Rating</th>
+                        <th>Views in Cinema</th>
+                        <th>Awards</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="movie : ${topViewed}">
+                        <td>
+                            <img th:src="${movie.getPoster()}" alt="Poster" class="img-thumbnail">
+                            <span th:text="${movie.getTitle()}" class="font-weight-bold d-block mt-2"></span>
+                        </td>
+                        <td><span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}"></span></td>
+                        <td><span th:text="${movie.getMovie_views()}"></span></td>
+                        <td><span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 
 

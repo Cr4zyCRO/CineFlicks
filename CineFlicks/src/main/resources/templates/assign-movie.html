@@ -4,42 +4,112 @@
     <title>Assign Movie to Cinema</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css"> <!-- For DatePicker -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.11.1/jquery.timepicker.min.css"> <!-- For TimePicker -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.11.1/jquery.timepicker.min.js"></script> <!-- For TimePicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.11.1/jquery.timepicker.min.css"> <!-- For TimePicker -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> <!-- Bootstrap CSS -->
 </head>
 <body>
 
-<h1>Assign Movie to Cinema</h1>
 
-<form id="assign-movie-form" onsubmit="return false;">
-    <h2 th:text="${movie.title}">Movie Title</h2>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand" th:href="@{/}">CineFlicks</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/profile/admin/add-movie}"> New Movie</a>
+            </li>
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" th:href="@{/announcement}"> Create Announcement</a>
+            </li>
 
-    <label for="cinema">Select Cinema:</label>
-    <select id="cinema" name="cinemaId" required>
-        <option th:each="cinema : ${cinemas}" th:value="${cinema.id}" th:text="${cinema.room}"></option>
-    </select>
+        </ul>
 
-    <label for="start-date">Start Date:</label>
-    <input type="date" id="start-date" name="start-date" required>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                <a class="nav-link" href="/profile/admin">Admin Page</a>
+            </li>
+            <!-- Profile and Sign Out links for authenticated users -->
+            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/logout}">Sign Out</a>
+                </li>
+            </th:block>
+            <!-- Sign In and Sign Up links for unauthenticated users -->
+            <th:block th:unless="${#authorization.expression('isAuthenticated()')}">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/login}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/auth/register}">Sign Up</a>
+                </li>
+            </th:block>
 
-    <label for="start-time">Start Time:</label>
-    <input type="time" id="start-time" name="start-time" required>
+        </ul>
+    </div>
+</nav>
 
-    <label for="price_per_seat">Price:</label>
-    <input type="number" id="price_per_seat" name="price_per_seat" required>
+<div class="container mt-5">
+    <div class="row mt-5">
+        <div class="col-md-6 mt-5">
+            <h1 class="text-center">Assign Movie to Cinema</h1>
 
-    <input type="hidden" id="movieId" name="movieId" th:value="${movie.getId()}">
+            <form id="assign-movie-form" onsubmit="return false;">
+                <div class="form-group">
+                    <h2 th:text="${movie.title}">Movie Title</h2>
+                </div>
 
-    <button type="button" onclick="assignMovie()">Assign Movie</button>
-</form>
+                <div class="form-group">
+                    <label for="cinema">Select Cinema:</label>
+                    <select id="cinema" name="cinemaId" class="form-control" required>
+                        <option th:each="cinema : ${cinemas}" th:value="${cinema.id}" th:text="${cinema.room}"></option>
+                    </select>
+                </div>
 
-<div id="message"></div> <!-- Placeholder for feedback messages -->
+                <div class="form-group">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date" name="start-date" class="form-control" required>
+                </div>
 
+                <div class="form-group">
+                    <label for="start-time">Start Time:</label>
+                    <input type="time" id="start-time" name="start-time" class="form-control" required>
+                </div>
 
-<div id="cinemaMovies">
-    <div th:each="cinemaMovie : ${cinemaMovies}">
-        <p th:text="${cinemaMovie.getCinema().getRoom()}+', '+ ${cinemaMovie.getMovie().getTitle()}+': '+
-                     'TimeStart: ' + ${cinemaMovie.getStartTime()} + ', TimeEnd: ' + ${cinemaMovie.getEndTime()}"></p>
+                <div class="form-group">
+                    <label for="price_per_seat">Price:</label>
+                    <input type="number" id="price_per_seat" name="price_per_seat" class="form-control" required>
+                </div>
+
+                <input type="hidden" id="movieId" name="movieId" th:value="${movie.getId()}">
+
+                <button type="button" onclick="assignMovie()" class="btn btn-success">Assign Movie</button>
+            </form>
+
+            <div id="message" class="mt-3"></div> <!-- Placeholder for feedback messages -->
+        </div>
+
+        <div class="col-md-6 mt-5">
+            <div id="cinemaMovies" class="mt-5">
+                <h2 class="text-center">Cinema Movies</h2>
+                <div th:each="cinemaMovie : ${cinemaMovies}" class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${cinemaMovie.getCinema().getRoom() + ', ' + cinemaMovie.getMovie().getTitle()}"></h5>
+                        <p class="card-text">
+                            <span th:text="'TimeStart: ' + ${#temporals.format(cinemaMovie.getStartTime(), 'dd.MM.yyyy, HH:mm')}"></span><br>
+                            <span th:text="'TimeEnd: ' + ${#temporals.format(cinemaMovie.getEndTime(), 'dd.MM.yyyy, HH:mm')}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -72,7 +142,7 @@
             },
             error: function(error) {
                 $("#message").text("Error: " + (error.responseJSON?.message || error.responseText) + "\n" +
-                                    "movieId: " + (movieId) + " cinemaId: " + (cinemaId) + " fullStarttime: " + (fullStartTime)); // Better error message
+                    "movieId: " + (movieId) + " cinemaId: " + (cinemaId) + " fullStarttime: " + (fullStartTime)); // Better error message
             }
         });
     }

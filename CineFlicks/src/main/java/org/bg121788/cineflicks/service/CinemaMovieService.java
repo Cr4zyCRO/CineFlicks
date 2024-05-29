@@ -8,7 +8,6 @@ import org.bg121788.cineflicks.repository.CinemaMovieRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoField;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +31,6 @@ public class CinemaMovieService {
             movies.sort(Comparator.comparing(cm -> cm.getMovie().getTitle(), Comparator.reverseOrder()));
         }
 
-//        for (CinemaMovie movie : movies) {
-//            System.err.println("Movie: " + movie.getMovie().getTitle());
-//        }
         return movies;
 
     }
@@ -54,8 +50,9 @@ public class CinemaMovieService {
         return cinemaMovieRepository.findByCinema(cinema);
     }
 
-    public List<CinemaMovie> getAllCinemaMovies() {
-        return cinemaMovieRepository.findAll();
+    public List<CinemaMovie> getCinemaMovies() {
+        LocalDateTime start = LocalDateTime.now();
+        return cinemaMovieRepository.findAllByStartTimeBeforeNow(start);
     }
 
     public Optional<CinemaMovie> getById(UUID cinemaMovieId) {

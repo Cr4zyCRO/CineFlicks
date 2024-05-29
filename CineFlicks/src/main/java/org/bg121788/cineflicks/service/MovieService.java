@@ -72,6 +72,10 @@ public class MovieService {
         return movieRepository.findTop10ByOrderByImdb_votesDesc();
     }
 
+    public List<Movie> searchMovies(String query) {
+        return movieRepository.findByTitleContainingIgnoreCase(query);
+    }
+
 
     public void deleteMovie(UUID movieId) {
         movieRepository.deleteById(movieId);
@@ -83,8 +87,10 @@ public class MovieService {
     }
 
     public void updateRating(Movie movie, Integer rating) {
-        movie.setImdb_rating(movie.getImdb_rating()+rating);
+        Double totalScore = movie.getImdb_rating() * movie.getImdb_votes();
+        totalScore += rating;
         movie.setImdb_votes(movie.getImdb_votes()+1);
+        movie.setImdb_rating(totalScore / movie.getImdb_votes());
         movieRepository.save(movie);
     }
 }
