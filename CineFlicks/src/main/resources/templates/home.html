@@ -98,6 +98,10 @@
         <div class="col-md-9 main-container">
             <h1 class="mt-4">Movies Airing This Week</h1>
 
+            <div class="mb-4">
+                <input type="text" id="movie-search-bar" class="form-control" placeholder="Movie search..." onkeyup="filterWatchedTickets()">
+            </div>
+
             <div class="mb-3">
                 <a class="btn btn-outline-success" th:href="@{/(sortDir=${sortDir == 'ASC' ? 'DESC' : 'ASC'}, sortBy='title')}">
                     Sort by Title
@@ -115,7 +119,7 @@
             </div>
 
             <!-- Movie Cards -->
-            <div class="row" th:each="movieGroup : ${groupedMovies}">
+            <div class="row movie-cards" th:each="movieGroup : ${groupedMovies}">
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-header">
@@ -188,7 +192,21 @@
 
 
 
+<script>
+    function filterWatchedTickets() {
+        var query = document.getElementById("movie-search-bar").value.toLowerCase();
+        var movies = document.getElementsByClassName("movie-cards");
 
+        Array.from(movies).forEach(function(movie) {
+            var title = movie.getElementsByClassName("card-header")[0].textContent.toLowerCase();
+            if (title.includes(query)) {
+                movie.style.display = "block"; // Show matching movies
+            } else {
+                movie.style.display = "none"; // Hide non-matching movies
+            }
+        });
+    }
+</script>
 
 
 
