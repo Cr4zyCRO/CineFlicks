@@ -2,7 +2,10 @@ package org.bg121788.cineflicks.controller;
 
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.entity.Movie;
+import org.bg121788.cineflicks.service.AnnouncementService;
+import org.bg121788.cineflicks.service.CinemaMovieService;
 import org.bg121788.cineflicks.service.MovieService;
+import org.bg121788.cineflicks.service.TicketService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,12 +19,19 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MovieController {
     private final MovieService movieService;
+    private final AnnouncementService announcementService;
+    private final CinemaMovieService cinemaMovieService;
+    private final TicketService ticketService;
     @PostMapping("/{id}")
     public ModelAndView deleteMovie(@PathVariable UUID id) {
         // Check if the movie exists
-        Optional<Movie> movieOptional = movieService.getById(id);
+        Optional<Movie> movie = movieService.getById(id);
+        announcementService.deleteMovieAnnouncement(movie);
 
-        if (movieOptional.isPresent()) {
+        cinemaMovieService.deleteMovieInCinemaMovie(movie);
+
+
+        if (movie.isPresent()) {
             movieService.deleteMovie(id); // Delete the movie
         }
 

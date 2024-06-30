@@ -2,12 +2,16 @@ package org.bg121788.cineflicks.service;
 
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.TicketDTO;
+import org.bg121788.cineflicks.entity.CinemaMovie;
+import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.entity.Ticket;
+import org.bg121788.cineflicks.entity.User;
 import org.bg121788.cineflicks.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -45,5 +49,13 @@ public class TicketService {
     public List<Ticket> getUpcomingTickets(String username) {
         LocalDateTime currentTime = LocalDateTime.now();
         return ticketRepository.findUpcomingTicketsAfter(username, currentTime);
+    }
+
+    public void deleteUserTickets(Optional<User> user) {
+        user.ifPresent(ticketRepository::deleteAllByUser);
+    }
+
+    public void deleteMovieTickets(CinemaMovie movie) {
+        ticketRepository.deleteAllByMovie(movie);
     }
 }

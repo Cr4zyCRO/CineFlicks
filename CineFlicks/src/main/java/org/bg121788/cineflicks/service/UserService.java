@@ -101,4 +101,8 @@ public class UserService {
         }
         return false;
     }
+
+    public Optional<User> getUserById(UUID userId) {
+        return userRepository.findById(userId);
+    }
 }

@@ -141,11 +141,25 @@
                 $("#message").text("Success: " + response);
             },
             error: function(error) {
-                $("#message").text("Error: " + (error.responseJSON?.message || error.responseText) + "\n" +
-                    "movieId: " + (movieId) + " cinemaId: " + (cinemaId) + " fullStarttime: " + (fullStartTime)); // Better error message
+                $("#message").text("Error: " + (error.responseJSON?.message || error.responseText) + "\n");
+                    //"movieId: " + (movieId) + " cinemaId: " + (cinemaId) + " fullStarttime: " + (fullStartTime)); // Better error message
             }
         });
     }
+
+    $(document).ready(function() {
+        $("#cinema").change(function() {
+            const selectedCinema = $(this).find("option:selected").text().toLowerCase();
+            $(".card").each(function() {
+                const title = $(this).find(".card-title").text().toLowerCase();
+                if (title.includes(selectedCinema)) {
+                    $(this).css("display", "block"); // Show matching movies
+                } else {
+                    $(this).css("display", "none"); // Hide non-matching movies
+                }
+            });
+        });
+    });
 </script>
 
 </body>

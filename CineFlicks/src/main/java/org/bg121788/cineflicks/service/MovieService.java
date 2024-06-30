@@ -3,10 +3,12 @@ package org.bg121788.cineflicks.service;
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.MovieDTO;
 import org.bg121788.cineflicks.entity.Movie;
+import org.bg121788.cineflicks.repository.CinemaMovieRepository;
 import org.bg121788.cineflicks.repository.MovieRepository;
 import org.bg121788.cineflicks.service.movie_related.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +23,8 @@ public class MovieService {
     private final WriterService writerService;
     private final ActorService actorService;
     private final LanguageService languageService;
+
+    private final CinemaMovieRepository cinemaMovieRepository;
 
     public boolean addNewMovie(MovieDTO movieDTO){
 
@@ -81,6 +85,28 @@ public class MovieService {
         movieRepository.deleteById(movieId);
     }
 
+    public List<Movie> getAssignedMovies() {
+        List<Movie> assignedMovies = new ArrayList<>();
+        List<Movie> allMovies = getAllMovies();
+        for (Movie movie : allMovies) {
+            if (cinemaMovieRepository.existsByMovie(movie)) {
+                assignedMovies.add(movie);
+            }
+        }
+        return assignedMovies;
+    }
+
+    public List<Movie> getNonAssignedMovies() {
+        List<Movie> nonAssignedMovies = new ArrayList<>();
+        List<Movie> allMovies = getAllMovies();
+        for (Movie movie : allMovies) {
+            if (!cinemaMovieRepository.existsByMovie(movie)) {
+                nonAssignedMovies.add(movie);
+            }
+        }
+        return nonAssignedMovies;
+    }
+
     public void updateViews(Movie movie, int size) {
         movie.setMovie_views(movie.getMovie_views() + size);
         movieRepository.save(movie);
@@ -93,4 +119,6 @@ public class MovieService {
         movie.setImdb_rating(totalScore / movie.getImdb_votes());
         movieRepository.save(movie);
     }
+
+
 }

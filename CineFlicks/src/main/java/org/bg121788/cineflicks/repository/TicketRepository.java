@@ -1,9 +1,14 @@
 package org.bg121788.cineflicks.repository;
 
+import jakarta.transaction.Transactional;
+import org.bg121788.cineflicks.entity.CinemaMovie;
+import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.entity.Ticket;
+import org.bg121788.cineflicks.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +28,13 @@ public interface TicketRepository extends JpaRepository<Ticket, UUID> {
     List<Ticket> findUpcomingTicketsAfter(String username, LocalDateTime currentTime);
 
 
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Ticket t WHERE t.user = :user")
+    void deleteAllByUser(User user);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Ticket t WHERE t.cinemaMovie = :cinemaMovie")
+    void deleteAllByMovie(CinemaMovie cinemaMovie);
 }

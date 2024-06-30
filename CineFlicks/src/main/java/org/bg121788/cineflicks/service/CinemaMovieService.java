@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.CinemaMovieDTO;
 import org.bg121788.cineflicks.entity.Cinema;
 import org.bg121788.cineflicks.entity.CinemaMovie;
+import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.repository.CinemaMovieRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Service
 public class CinemaMovieService {
     private final CinemaMovieRepository cinemaMovieRepository;
+    private final TicketService ticketService;
 
     public List<CinemaMovie> getMoviesForThisWeek(String sortDir){
         LocalDateTime start = LocalDateTime.now();
@@ -57,5 +59,16 @@ public class CinemaMovieService {
 
     public Optional<CinemaMovie> getById(UUID cinemaMovieId) {
         return cinemaMovieRepository.findById(cinemaMovieId);
+    }
+
+    public void deleteMovieInCinemaMovie(Optional<Movie> movie) {
+        List<CinemaMovie> cinemaMovies;
+        if (movie.isPresent()) {
+            cinemaMovies = cinemaMovieRepository.findAllByMovie(movie.get());
+            for (CinemaMovie cinemaMovie : cinemaMovies){
+                ticketService.deleteMovieTickets(cinemaMovie);
+            }
+            cinemaMovieRepository.deleteAllByMovie(movie.get());
+        }
     }
 }

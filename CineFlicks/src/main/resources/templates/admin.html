@@ -10,6 +10,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 
+    <style>
+
+        .rating-number,
+        .views-number {
+            font-size: 5rem; /* Adjust the size as needed */
+            font-weight: bold;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -57,10 +66,9 @@
     </div>
 </nav>
 
-
 <!-- Section to display users -->
-<div class="container mt-4">
-    <h2>Users</h2>
+<div class="container mt-5">
+    <h2 class="text-center font-weight-bold mt-5">Users</h2>
     <div class="table-responsive"> <!-- Make the table responsive -->
         <table class="table table-bordered table-striped user-table"> <!-- Bootstrap table -->
             <thead>
@@ -79,7 +87,7 @@
                 <td th:text="${user.getEmail()}"></td>
                 <td th:text="${user.getRole()}"></td>
                 <td>
-                    <button type="button" class="btn btn-danger delete-btn">Delete</button>
+                    <button th:if="${#authentication.getName() != user.getUsername()}" type="button" class="btn btn-danger delete-btn">Delete</button>
                 </td>
             </tr>
             </tbody>
@@ -91,16 +99,46 @@
 
 
 <div class="container mt-5">
-    <h1 class="text-center font-weight-bold">Movies</h1>
+    <h1 class="text-center font-weight-bold">Assigned Movies</h1>
 
     <!-- Search bar to filter movies -->
     <div class="mb-4">
-        <input type="text" id="search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterMovies()">
+        <input type="text" id="assigned-search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterAssignedMovies()">
     </div>
 
-    <div class="row" id="movie-list">
+    <div class="row" id="assigned-movie-list">
         <!-- Loop through movies and display as cards -->
-        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${movies}" th:id="'movie-' + ${movie.getId()}">
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${assignedMovies}" th:id="'movie-' + ${movie.getId()}">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-center font-weight-bold" th:text="${movie.getTitle()}"></h5>
+                    <p class="card-text text-center">Rated: <span th:text="${movie.getRated()}"></span></p>
+                    <p class="card-text text-center">Runtime: <span th:text="${movie.getRuntime()}"></span></p>
+                    <p class="card-text text-center">Genres: <span th:each="genre : ${movie.getGenre()}" th:text="${genre.getGenre()} + ' '"></span></p>
+                    <div class="text-center">
+                        <a class="btn btn-success" th:href="@{/cinema/assign-movie/{movieId}(movieId = ${movie.getId()})}">Assign Cinema</a>
+                        <form th:action="@{/movie/{id}(id=${movie.getId()})}" method="post" class="d-inline-block ml-2">
+                            <input type="hidden" name="_method" value="post"/>
+                            <button type="submit" class="btn btn-danger">Remove</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-5" th:if="${!nonAssignedMovies.isEmpty()}">
+    <h1 class="text-center font-weight-bold">Old Non Assigned Movies</h1>
+
+    <!-- Search bar to filter movies -->
+    <div class="mb-4">
+        <input type="text" id="non-assigned-search-bar" class="form-control" placeholder="Search movies..." onkeyup="filterNonAssignedMovies()">
+    </div>
+
+    <div class="row" id="non-assigned-movie-list">
+        <!-- Loop through movies and display as cards -->
+        <div class="col-lg-4 col-md-6 col-sm-12" th:each="movie : ${nonAssignedMovies}" th:id="'movie-' + ${movie.getId()}">
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title text-center font-weight-bold" th:text="${movie.getTitle()}"></h5>
@@ -121,17 +159,17 @@
 </div>
 
 
+
 <div class="container mt-4">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <h2 class="text-center font-weight-bold">Top-Rated Movies</h2>
             <div class="table-responsive">
                 <table class="table table-striped text-center">
                     <thead>
                     <tr>
-                        <th>Movie</th>
-                        <th>IMDb Rating</th>
-                        <th>Awards</th>
+                        <th class="text-center font-weight-bold" >Movie</th>
+                        <th class="text-center font-weight-bold">IMDb Rating</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -140,23 +178,23 @@
                             <img th:src="${movie.getPoster()}" alt="Poster" class="img-thumbnail">
                             <span th:text="${movie.getTitle()}" class="font-weight-bold d-block mt-2"></span>
                         </td>
-                        <td><span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}"></span></td>
-                        <td><span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span></td>
+                        <td class="rating-cell">
+                            <span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}" class="rating-number"></span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
             <h2 class="text-center font-weight-bold">Top-Viewed Movies</h2>
             <div class="table-responsive">
                 <table class="table table-striped text-center">
                     <thead>
                     <tr>
-                        <th>Movie</th>
-                        <th>IMDb Rating</th>
-                        <th>Views in Cinema</th>
-                        <th>Awards</th>
+                        <th class="text-center font-weight-bold">Movie</th>
+                        <th class="text-center font-weight-bold">IMDb Rating</th>
+                        <th class="text-center font-weight-bold">Views in Cinema</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -165,9 +203,12 @@
                             <img th:src="${movie.getPoster()}" alt="Poster" class="img-thumbnail">
                             <span th:text="${movie.getTitle()}" class="font-weight-bold d-block mt-2"></span>
                         </td>
-                        <td><span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}"></span></td>
-                        <td><span th:text="${movie.getMovie_views()}"></span></td>
-                        <td><span th:text="${#strings.isEmpty(movie.getAwards()) ? 'None' : movie.getAwards()}"></span></td>
+                        <td class="rating-cell">
+                            <span th:text="${#numbers.formatDecimal(movie.imdb_rating, 0, 'COMMA', 1, 'POINT')}" class="rating-number"></span>
+                        </td>
+                        <td class="views-cell ">
+                            <span th:text="${movie.getMovie_views()}" class="views-number"></span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -186,9 +227,23 @@
 <!-- Script to implement the filter and AJAX deletion -->
 <script>
     // Function to filter movies based on search input
-    function filterMovies() {
-        var query = document.getElementById("search-bar").value.toLowerCase();
-        var movies = document.getElementById("movie-list").getElementsByClassName("col-lg-4");
+    function filterAssignedMovies() {
+        var query = document.getElementById("assigned-search-bar").value.toLowerCase();
+        var movies = document.getElementById("assigned-movie-list").getElementsByClassName("col-lg-4");
+
+        Array.from(movies).forEach(function(movie) {
+            var title = movie.getElementsByClassName("card-title")[0].innerText.toLowerCase();
+            if (title.includes(query)) {
+                movie.style.display = "block"; // Show matching movies
+            } else {
+                movie.style.display = "none"; // Hide non-matching movies
+            }
+        });
+    }
+
+    function filterNonAssignedMovies() {
+        var query = document.getElementById("non-assigned-search-bar").value.toLowerCase();
+        var movies = document.getElementById("non-assigned-movie-list").getElementsByClassName("col-lg-4");
 
         Array.from(movies).forEach(function(movie) {
             var title = movie.getElementsByClassName("card-title")[0].innerText.toLowerCase();
@@ -216,8 +271,11 @@
                         window.location.reload(true);
                     },
                     error: function(xhr, status, error) {
-                        console.log(xhr.responseText); // Log the error response
-                        alert('Error deleting user: ' + error);
+                        console.error('Error Status:', status);
+                        console.error('Error:', error);
+                        console.error('Response Text:', xhr.responseText);
+                        alert('Error deleting user: ' + status);
+
                     }
                 });
             }

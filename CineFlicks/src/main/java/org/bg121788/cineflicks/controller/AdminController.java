@@ -2,6 +2,7 @@ package org.bg121788.cineflicks.controller;
 
 import lombok.AllArgsConstructor;
 import org.bg121788.cineflicks.dto.MovieDTO;
+import org.bg121788.cineflicks.entity.Movie;
 import org.bg121788.cineflicks.service.MovieService;
 import org.bg121788.cineflicks.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -25,7 +27,12 @@ public class AdminController {
     @GetMapping
     public ModelAndView adminWebsite(){
         ModelAndView modelAndView = new ModelAndView("admin");
-        modelAndView.addObject("movies", movieService.getAllMovies());
+
+        List<Movie> assignedMovies = movieService.getAssignedMovies();
+        List<Movie> nonAssignedMovies = movieService.getNonAssignedMovies();
+
+        modelAndView.addObject("assignedMovies", assignedMovies);
+        modelAndView.addObject("nonAssignedMovies", nonAssignedMovies);
         modelAndView.addObject("users", userService.getAllUsers());
         modelAndView.addObject("topRated", movieService.getTop10MostRated());
         modelAndView.addObject("topViewed", movieService.getTop10MostViewed());
